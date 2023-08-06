@@ -6,8 +6,6 @@
   "devDependencies": {
     "@babel/cli": "^7.22.9",
     "@babel/core": "^7.22.9",
-    "@babel/preset-env": "^7.22.9",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-plugin-transform-remove-strict-mode": "^0.0.2"
+    "@babel/preset-env": "^7.22.9"
   }
 }
