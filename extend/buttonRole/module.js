@@ -40,12 +40,11 @@ define(function() {
                     }
                     return isUserRole;
                 }
-            }
-        };
-        $customWebData.module.add({
-            ...info, init: function() {
+            },
+            "init": function() {
 
             }
-        });
+        };
+        $customWebData.module.add(info);
     }
 })

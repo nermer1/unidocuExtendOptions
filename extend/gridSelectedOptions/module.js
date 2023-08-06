@@ -18,7 +18,8 @@ define(function() {
                             "OPTIONS": [
                                 { "text": "hide", "value": "A" },
                                 { "text": "radio", "value": "B" },
-                                { "text": "checkAll", "value": "C" }
+                                { "text": "checkAll", "value": "C" },
+                                { "text": "force", "value": "D" }
                             ],
                             "COL_SPAN": "2"
                         }
@@ -26,18 +27,31 @@ define(function() {
                 }
             },
             "method": {
+                "option": {
+                    "isHide": false,
+                    "isRadio": false,
+                    "isCheckAll": false,
+                    "isForce": false
+                },
                 "setOptions": function(gridObj, os_data) {
-                    var option = os_data["SELECTED_OPTIONS"] || "";
-                    gridObj.setColumnHide('SELECTED', !!option.match("A"));
-                    gridObj.setCheckBarAsRadio('SELECTED', !!option.match("B"));
-                    gridObj.setHeaderCheckBox('SELECTED', !!option.match("C"));
+                    var option = os_data["SELECTED_OPTIONS"] || "",
+                        isHide = !!option.match("A"),
+                        isRadio = !!option.match("B"),
+                        isCheckAll = !!option.match("C"),
+                        isForce = !!option.match("D");
+                    info.method.option.isHide = isHide;
+                    info.method.option.isRadio = isRadio;
+                    info.method.option.isCheckAll = isCheckAll;
+                    info.method.option.isForce = isForce;
+                    gridObj.setColumnHide('SELECTED', isHide);
+                    gridObj.setCheckBarAsRadio('SELECTED', isRadio);
+                    gridObj.setHeaderCheckBox('SELECTED', isCheckAll);
                 }
-            }
-        };
-        $customWebData.module.add({
-            ...info, init: function() {
+            },
+            "init": function() {
 
             }
-        });
+        };
+        $customWebData.module.add(info);
     }
 })

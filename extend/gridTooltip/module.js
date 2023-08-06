@@ -27,12 +27,11 @@ define(function() {
                         if(gridObj.getGridHeader(column)) gridObj.useColumnTooltip(column, true);
                     });
                 }
-            }
-        };
-        $customWebData.module.add({
-            ...info, init: function() {
+            },
+            "init": function() {
 
             }
-        });
+        };
+        $customWebData.module.add(info);
     }
 })

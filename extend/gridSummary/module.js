@@ -47,12 +47,11 @@ define(function() {
                         info["method"].changeHandler($u.get("USE_SUMMARY").getValue());
                     });
                 }
-            }
-        };
-        $customWebData.module.add({
-            ...info, init: function() {
+            },
+            "init": function() {
 
             }
-        });
+        };
+        $customWebData.module.add(info);
     }
 })

@@ -60,12 +60,11 @@ define(function() {
                             .concat(isAll? Object.values(gridGroupHeaderInfo).map(groupParent => groupParent["name"]) : [])
                             .forEach(columnKey => gridObj._rg.gridView.setColumnProperty(columnKey, "header", colorMap));
                 }
-            }
-        };
-        $customWebData.module.add({
-            ...info, init: function() {
+            },
+            "init": function() {
 
             }
-        });
+        };
+        $customWebData.module.add(info);
     }
 })

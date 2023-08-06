@@ -29,12 +29,11 @@ define(function() {
                     else if(typeof groupInfo === "object" && Object.keys(groupInfo).length === 0) return;
                     gridObj.setGroupHeader(groupInfo);
                 }
-            }
-        };
-        $customWebData.module.add({
-            ...info, init: function() {
+            },
+            "init": function() {
 
             }
-        });
+        };
+        $customWebData.module.add(info);
     }
 })

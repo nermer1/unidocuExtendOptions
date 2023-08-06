@@ -13,10 +13,11 @@ define(function() {
                     "OT_DATA": [
                         {
                             "COLUMN_ID": "SORTING_NOT_USED",
-                            "TEXT": "정렬미사용",
+                            "TEXT": "그리드정렬",
                             "COLUMN_TYPE": "Uni_CheckBox",
                             "OPTIONS": [
-                                { "text": "", "value": "1" }
+                                { "text": "unused", "value": "A" },
+                                { "text": "force", "value": "B" }
                             ]
                         },
                         {
@@ -24,23 +25,32 @@ define(function() {
                             "TEXT": "옵션",
                             "COLUMN_TYPE": "Uni_CheckBox",
                             "OPTIONS": [
-                                { "text": "explicit", "value": "1" }
+                                { "text": "explicit", "value": "A" }
                             ]
                         }
                     ]
                 }
             },
             "method": {
+                "option": {
+                    "isSort": false,
+                    "isForce": false,
+                },
                 "setOptions": function(gridObj, os_data) {
-                    var isSort = os_data["SORTING_NOT_USED"] !== "1",
-                        isExplicit = os_data["SORTING_MODE"] === "1";
+                    var option = os_data["SORTING_NOT_USED"] || "",
+                        isSort = !option.match("A"),
+                        isForce = !!option.match("B"),
+                        isExplicit = os_data["SORTING_MODE"] === "A";
+                    info.method.option.isSort = isSort;
+                    info.method.option.isForce = isForce;
                     gridObj._rg.setSortingOptions({enabled: isSort});
                     if(isSort && isExplicit) gridObj._rg.gridView.setOptions({sortMode: "explicit"});
                 },
                 "changeHandler": function(used) {
+                    used = used || "";
                     var formId = "SORTING_MODE";
                     if(!$u.get(formId)) return;
-                    if(used === "1") $u.get(formId).setReadOnly(true);
+                    if(!!used.match("A")) $u.get(formId).setReadOnly(true);
                     else $u.get(formId).setReadOnly(false);
                 },
                 "addEvent": function() {
@@ -48,12 +58,11 @@ define(function() {
                         info["method"].changeHandler($u.get("SORTING_NOT_USED").getValue());
                     });
                 }
-            }
-        };
-        $customWebData.module.add({
-            ...info, init: function() {
+            },
+            "init": function() {
 
             }
-        });
+        };
+        $customWebData.module.add(info);
     }
 })

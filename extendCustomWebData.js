@@ -27,7 +27,10 @@
  *     scope: gridSetting
  *     description: 그리드 정렬 설정
  *     params: {
- *         SORTING_NOT_USED: 체크 시 정렬 사용하지 않음, 해제 시 정렬 사용
+ *         SORTING_NOT_USED: {
+ *             unused: 체크 시 정렬 사용하지 않음, 해제 시 정렬 사용
+ *             force: 강제 적용, 렌더 이후 화면별 view, base js에 별도로 적용된 경우를 무시하고 옵션 적용
+ *         }
  *         SORTING_MODE: cell에 값 입력 시 자동 정렬 사용 여부, 체크시 미사용
  *     }
  * }
@@ -77,6 +80,7 @@
  *             hide: 체크 시 선택 영역 숨김 처리
  *             radio: 체크 시 선택 영역 라디오 버튼으로 변경
  *             checkAll: 체크 시 전체 선택 활성화
+ *             force: 강제 적용, 렌더 이후 화면별 view, base js에 별도로 적용된 경우를 무시하고 옵션 적용
  *         }
  *     }
  * }
@@ -93,11 +97,8 @@
 define(function() {
     window.$customWebData || (window.$customWebData = function() {
         const customInfo = {
-            config: {
-                extraModules: ["gridSorting", "gridSummary", "gridTooltip", "gridHeaderGroup", "gridHeaderColor", "gridRowColor", "gridSelectedOptions", "buttonRole"]
-            },
             "moduleLoad": function(path) {
-                const extraModules = customInfo.config.extraModules;
+                const extraModules = $customWebData.getConfig().extraModules;
                 extraModules.map((name, index) => extraModules[index] = path + name + "/module");
                 require(extraModules, function() {
                     for(let module of arguments) {
@@ -109,7 +110,7 @@ define(function() {
                 Object.keys(webData).map(function(key) {
                     if(!$u.webData.customWebDataMap[key]) throw "존재하지 않는 웹데이터 아이디";
                     if(webData[key].hasOwnProperty("OT_DATA")) $u.webData.customWebDataMap[key]["OT_DATA"].push(...webData[key]["OT_DATA"]);
-                    if(webData[key].hasOwnProperty("OS_DATA")) $.extend($u.webData.customWebDataMap[key]["OS_DATA"], webData[key]["OS_DATA"]);
+                    if(webData[key].hasOwnProperty("OS_DATA")) $customWebData.module.extend($u.webData.customWebDataMap[key]["OS_DATA"], webData[key]["OS_DATA"]);
                 });
             }
         };
@@ -128,15 +129,38 @@ define(function() {
         return customInfo;
     }());
 
-    // config 테스트 용도
-    $customWebData.config.test = function() {
-        console.log(this);
+    /**
+     *
+     *
+     */
+    const config = {
+        "version": "1.0.0",
+        "name": "extendCustomWebData",
+        "description": "unidocu5 plugin, f8 option extension",
+        "extraModules": ["gridSorting", "gridSummary", "gridTooltip", "gridHeaderGroup", "gridHeaderColor", "gridRowColor", "gridSelectedOptions", "buttonRole"]
+    };
+    $customWebData.getConfig = () => config;
+    $customWebData.setConfig = (option) => {
+        if(Array.isArray(option)
+            || typeof option !== "object"
+            || Object.keys(option).length > 1
+            || !option.hasOwnProperty("extraModules")) throw "{extraModules: [module1, module2...]} 형태만 입력 바람.";
+        config["extraModules"] = option["extraModules"];
     }
 
     /**
      * 여러가지 util
      */
     $customWebData.tools = {
+        extend: function() {
+            var o = arguments[0];
+            for(var i = 1; i < arguments.length; ++i) {
+                for(var k in arguments[i]) {
+                    if(arguments[i].hasOwnProperty(k)) o[k] = arguments[i][k];
+                }
+            }
+            return o;
+        },
         /**
          * 문자열 구분자로 분리 반환, 구분자 입력 시 앞뒤 공백 제거
          *
@@ -371,6 +395,41 @@ define(function() {
      * @param gridObj 그리드 객체
      */
     function customizeBindExtendAPI(gridObj) {
+        gridObj.setCheckBarAsRadio = function (columnKey, useAsRadio) {
+            if ($customWebData.module.hasModule("gridSelectedOptions")) {
+                var module = $customWebData.module.getModule("gridSelectedOptions");
+                if(module.option.isForce) useAsRadio = module.option.isRadio;
+            }
+            gridObj._rg.setCheckBar({exclusive: useAsRadio === null || useAsRadio === undefined ? true : useAsRadio});
+        }
+        gridObj.setHeaderCheckBox = function (columnKey, useHeaderCheckbox) {
+            if ($customWebData.module.hasModule("gridSelectedOptions")) {
+                var module = $customWebData.module.getModule("gridSelectedOptions");
+                if(module.option.isForce) useHeaderCheckbox = module.option.isCheckAll;
+            }
+            gridObj._rg.setCheckBar({showAll: useHeaderCheckbox});
+        }
+        gridObj.setColumnHide = function (columnKey, isHide) {
+            if ($customWebData.module.hasModule("gridSelectedOptions")) {
+                var module = $customWebData.module.getModule("gridSelectedOptions");
+                if(module.option.isForce) isHide = module.option.isHide;
+            }
+            var visible = isHide === false;
+            if (columnKey === 'SELECTED') gridObj._rg.setCheckBar({visible: visible});
+            else gridObj._rg.setColumnProperty(columnKey, 'visible', visible);
+
+            if(gridObj.getGridHeader(columnKey) && gridObj.getGridHeader(columnKey)['serverType'] === 'popup') {
+                gridObj._rg.setColumnProperty(columnKey + '_', 'visible', visible);
+                gridObj._rg.setColumnProperty(columnKey + '_TXT', 'visible', visible);
+            }
+        }
+        gridObj.setSortEnable = function (enable) {
+            if ($customWebData.module.hasModule("gridSorting")) {
+                var module = $customWebData.module.getModule("gridSorting");
+                if(module.option.isForce) enable = module.option.isSort;
+            }
+            gridObj._rg.setSortingOptions({enabled: enable});
+        }
         gridObj._onRowActivate = function (rowIndex) {
             gridObj["__onRowActivate"].apply(this, arguments);
             if($customWebData.module.hasModule("gridRowColor")) $customWebData.module.getModule("gridRowColor").changeBgColorHandler(gridObj, rowIndex);
@@ -459,7 +518,6 @@ define(function() {
     const _renderGridSingle = $u.renderGridSingle;
     $u.renderGridSingle = function(gridObj, subGroup) {
         _renderGridSingle(gridObj, subGroup);
-        let $gridObj = $(gridObj), subId = $gridObj.data("subId");
-        $customWebData.module.setOptions(gridObj, $u.webData.gridSetting.getData($u.webData.getWEB_DATA_ID([subGroup, subId]))["OS_DATA"]);
+        $customWebData.module.setOptions(gridObj, $u.webData.gridSetting.getData($u.webData.getWEB_DATA_ID([subGroup, $(gridObj).data("subId")]))["OS_DATA"]);
     }
 })

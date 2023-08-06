@@ -46,8 +46,8 @@ define(function() {
                     info.method.option.isUsed = os_data["SET_ROW_COLOR"] === "1";
                     info.method.option.color = $customWebData.tools.hexColorToRgbColor(color);
                 },
-                "getUesd": function(gridObj) {
-                    var readOnly = true, headers = gridObj.getGridHeaders();
+                "getUsed": function(gridObj) {
+                    var readOnly = true, headers = $customWebData.tools.getVisibleGridColumnKeys(gridObj);
                     for(var i in headers) {
                         if(headers[i]["key"] === "SELECTED" || headers[i]["key"] === "CRUD") continue;
                         if(headers[i]["edit"] === true) { readOnly = false; break; }
@@ -56,7 +56,7 @@ define(function() {
                     return info.method.option.isUsed && readOnly && !gridObj._rg.gridView.isMergedGrouped();
                 },
                 "changeBgColorHandler": function(gridObj, rowIndex) {
-                    if(!info.method.getUesd(gridObj)) return;
+                    if(!info.method.getUsed(gridObj)) return;
                     if(gridObj.preSelectedIndex !== undefined) {
                         Object.keys(gridObj.preCellColorMap).map(function(key) {
                             gridObj.setCellBgColor(key, gridObj.preSelectedIndex, gridObj.preCellColorMap[key] ? gridObj.rg.style._toWisegridColorText(gridObj.preCellColorMap[key]) : "");
@@ -73,12 +73,11 @@ define(function() {
                         return colorMap;
                     }, {});
                 }
-            }
-        };
-        $customWebData.module.add({
-            ...info, init: function() {
+            },
+            "init": function() {
 
             }
-        });
+        };
+        $customWebData.module.add(info);
     }
 })
