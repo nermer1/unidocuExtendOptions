@@ -29,6 +29,6 @@
             }
         ],
         "lines-between-class-members": ["error", "always", {"exceptAfterSingleLine": true}],
-        "no-explicit-any": false
+        "no-explicit-any": "0"
     }
 }
