@@ -1,7 +1,7 @@
 {
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "compile": "babel extendCustomWebData.js --out-dir output && babel extend --out-dir output/extend && prettier --write output/"
+        "compile": "babel extendCustomWebData.js --out-dir target && babel extend --out-dir target/extend && prettier --write --ignore-path .prettierignore target/"
     },
     "devDependencies": {
         "@babel/cli": "^7.22.9",
