@@ -102,15 +102,16 @@ define(function () {
                     const extraModules = $customWebData.getConfig().extraModules;
                     extraModules.map((name, index) => (extraModules[index] = path + name + '/module'));
                     require(extraModules, function () {
-                        for (let module of arguments) {
-                            module.call(this);
+                        for (let index in arguments) {
+                            arguments[index].call(this);
                         }
                     });
                 },
                 extendWebData: function (webData) {
                     Object.keys(webData).map(function (key) {
                         if (!$u.webData.customWebDataMap[key]) throw '존재하지 않는 웹데이터 아이디';
-                        if (webData[key].hasOwnProperty('OT_DATA')) $u.webData.customWebDataMap[key]['OT_DATA'].push(...webData[key]['OT_DATA']);
+                        if (webData[key].hasOwnProperty('OT_DATA'))
+                            webData[key]['OT_DATA'].map((data) => $u.webData.customWebDataMap[key]['OT_DATA'].push(data));
                         if (webData[key].hasOwnProperty('OS_DATA'))
                             $customWebData.module.extend($u.webData.customWebDataMap[key]['OS_DATA'], webData[key]['OS_DATA']);
                     });
@@ -119,14 +120,14 @@ define(function () {
 
             // 초기 데이터 필요시 설정
             /*(function init() {
-            customInfo['extendWebData'].call(this, {
-                "gridSetting@form-data": {
-                    "OS_DATA": {
-                        "COL_LEN": "3"
+                customInfo['extendWebData'].call(this, {
+                    "gridSetting@form-data": {
+                        "OS_DATA": {
+                            "COL_LEN": "3"
+                        }
                     }
-                }
-            });
-        }());*/
+                });
+            }());*/
 
             return customInfo;
         })());
