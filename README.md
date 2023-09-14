@@ -14,4 +14,7 @@ define(['vendorCustom/extendCustomWebData'], function (extendCustomWebData) {
 });
 ```
 
+buttonRole 사용한다면 아래 내용을 customize.css 에 작성
+#unipost-unidocu .unidocu-button.hidden {display: none;}
+
 ### 버전 정의
