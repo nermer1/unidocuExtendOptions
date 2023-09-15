@@ -137,8 +137,76 @@ define(['vendorCustom/extendCustomWebData'], function (extendCustomWebData) {
 });
 ```
 
-buttonRole 사용한다면 아래 내용을 customize.css 에 작성
+buttonRole 기능을 사용한다면 다음 절차를 진행
+
+core 소스
+
+unidocu-button.css
 ```css
+#unipost-unidocu .unidocu-button.hidden {display: none;} -> 제거
+```
+
+unidocuButton.js
+```javascript
+// isShowRoleButton 제거
+function isShowRoleButton(os_data) {
+    var bool = false, trimSplit = function(a, b) {
+        var p = {};
+        b = '\\' + ((!b)? ',':b);
+        p['p1'] = new RegExp(b + '[' + b + '\\s]*?$', 'i');
+        p['p2'] = new RegExp('\\s*' + b + '\\s*');
+        return a.replace(p['p1'], '').split(p['p2']);
+    }
+    $.each(trimSplit(os_data['BUTTON_ROLE']), function(_, role) {
+        if(new RegExp(role, 'gi').test(staticProperties.user['ROLE'])) {
+            bool = true;
+            return false;
+        }
+    });
+    return bool;
+}
+
+$u.buttons.getSingleButtonsEl = function(os_data){
+    ... 생략
+    // 2라인 제거
+    if (!os_data['BUTTON_ROLE']) os_data['BUTTON_ROLE'] = '';
+    if (!isShowRoleButton(os_data)) os_data['VISIBLE'] = 'hidden';
+}
+
+```
+
+Uni_ButtonTemplate.mustache
+```javascript
+//아래 라인에서 {{VISIBLE}} 제거
+<button id="{{BUTTON_ID}}" class="unidocu-button {{align}} {{COLOR}} {{VISIBLE}}">{{TEXT}}</button>
+```
+
+getCustomWebData.js
+//아래 항목 찾아서 제거
+```javascript
+{
+    "FNAME": "VISIBLE",
+    "WIDTH": "100",
+    "TYPE": "customCombo",
+    "EDIT": "X",
+    "ADD_EMPTY": "X",
+    "OPTIONS": [
+        "hidden"
+    ]
+},
+{
+    "FNAME": "BUTTON_ROLE",
+    "WIDTH": "100",
+    "TYPE": "text",
+    "EDIT": "X"
+}
+```
+
+일반 소스
+
+customize.css
+```css
+// 추가
 #unipost-unidocu .unidocu-button.hidden {display: none;}
 ```
 
