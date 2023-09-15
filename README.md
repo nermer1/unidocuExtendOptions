@@ -80,10 +80,15 @@ ignore Grid Panel: 패널 show/hide
 ```
 
 #행색상
+
+옵션 적용 예시
+
+![image](https://github.com/nermer1/unidocuExtendOptions/assets/51549944/c54e30d0-d412-4bd9-ba61-6427c9697efa)
+
 ```javascript
 {
     name: {
-        used: 라인 색상 적용(수정 가능 필드가 하나라도 있는 경우엔 옵션 적용은 무시)
+        used: 활성화된 라인 색상 적용(수정 가능 필드가 하나라도 있는 경우엔 옵션 적용은 무시)
     },
     options: {
         배경: 기본 배경 색상
