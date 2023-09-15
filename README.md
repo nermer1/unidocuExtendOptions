@@ -2,6 +2,7 @@
 
 유니다큐 F8 영역 추가 옵션
 
+
 ### 기능
 ![image](https://github.com/nermer1/unidocuExtendOptions/assets/51549944/15c463f3-ef7b-4ceb-a781-56f2ac8c4847)
 
@@ -27,6 +28,11 @@ ignore Grid Panel: 패널 show/hide
 ```
 
 #합계
+
+옵션 적용 예시
+
+![image](https://github.com/nermer1/unidocuExtendOptions/assets/51549944/f8733225-af61-442d-9532-ce0f87898cfd)
+
 ```javascript
 {
     name: {
@@ -40,6 +46,11 @@ ignore Grid Panel: 패널 show/hide
 ```
 
 #툴팁
+
+옵션 적용 예시
+
+![image](https://github.com/nermer1/unidocuExtendOptions/assets/51549944/e4d2f170-b35f-4413-89e1-f02bfb432180)
+
 ```javascript
 {
     name: {
@@ -98,6 +109,11 @@ ignore Grid Panel: 패널 show/hide
 ```
 
 #체크바
+
+옵션 적용 예시
+
+![image](https://github.com/nermer1/unidocuExtendOptions/assets/51549944/e853080d-ff58-414b-bc2b-6cd4ea7bf1c9)
+
 ```javascript
 {
     name: {
@@ -125,5 +141,8 @@ buttonRole 사용한다면 아래 내용을 customize.css 에 작성
 ```css
 #unipost-unidocu .unidocu-button.hidden {display: none;}
 ```
+
+### 다운로드
+[unidocuExtendOptions 1.0.0.zip](https://github.com/nermer1/unidocuExtendOptions/files/12616633/unidocuExtendOptions.1.0.0.zip)
 
 ### 버전 정의
