@@ -6,14 +6,8 @@
 ### 기능
 ![image](https://github.com/nermer1/unidocuExtendOptions/assets/51549944/15c463f3-ef7b-4ceb-a781-56f2ac8c4847)
 
-##기본
 
-PANEL_TITLE: 패널 제목(패널이 보일 경우)
-ignore Grid Panel: 패널 show/hide
-
-##확장
-
-#정렬
+##정렬(모듈명: gridSorting)
 ```javascript
 {
     name: {
@@ -27,7 +21,7 @@ ignore Grid Panel: 패널 show/hide
 }
 ```
 
-#합계
+##합계(모듈명: gridSummary)
 
 옵션 적용 예시
 
@@ -45,7 +39,7 @@ ignore Grid Panel: 패널 show/hide
 }
 ```
 
-#툴팁
+##툴팁(모듈명: gridTooltip)
 
 옵션 적용 예시
 
@@ -60,7 +54,7 @@ ignore Grid Panel: 패널 show/hide
 }
 ```
 
-#그룹핑
+##그룹핑(모듈명: gridHeaderGroup)
 ```javascript
 {
     name: {
@@ -70,7 +64,7 @@ ignore Grid Panel: 패널 show/hide
 }
 ```
 
-#컬럼색상
+##컬럼색상(모듈명: gridHeaderColor)
 
 옵션 적용 예시
 
@@ -90,7 +84,7 @@ ignore Grid Panel: 패널 show/hide
 }
 ```
 
-#행색상
+##행색상(모듈명: gridRowColor)
 
 옵션 적용 예시
 
@@ -108,7 +102,7 @@ ignore Grid Panel: 패널 show/hide
 }
 ```
 
-#체크바
+##체크바(모듈명: gridSelectedOptions)
 
 옵션 적용 예시
 
@@ -123,6 +117,22 @@ ignore Grid Panel: 패널 show/hide
         force: 강제 적용 옵션(기존에 설정된 정렬 로직 무시하고 현재 설정 강제 적용)
     },
     category: gridSetting
+}
+```
+
+##버튼권한(모듈명: buttonRole)
+
+옵션 적용 예시
+
+![image](https://github.com/nermer1/unidocuExtendOptions/assets/51549944/e853080d-ff58-414b-bc2b-6cd4ea7bf1c9)
+
+```javascript
+{
+    name: {
+        VISIBLE: hidden 선택 시 버튼 hide 상태로 렌더링, BUTTON_ROLE 권한이 존재하면 권한에 반대되도록 동작 예를 들어 ALL 권한이고 hidden 선택인 경우엔 ALL권한만 버튼 숨김,
+        BUTTON_ROLE: 권한 지정 콤마(,)로 여러 권한 적용
+    },
+    category: buttonSetting
 }
 ```
 
