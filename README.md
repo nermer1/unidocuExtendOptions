@@ -2,9 +2,11 @@
 
 유니다큐 F8 영역 추가 옵션
 
+---
 
 ### 기능
 ![image](https://github.com/nermer1/unidocuExtendOptions/assets/51549944/15c463f3-ef7b-4ceb-a781-56f2ac8c4847)
+
 
 
 ##정렬(모듈명: gridSorting)
@@ -136,6 +138,7 @@
 }
 ```
 
+---
 
 ### 사용
 
@@ -234,5 +237,6 @@ customize.css
 #unipost-unidocu .unidocu-button.hidden {display: none;}
 ```
 
+---
 
 ### 버전 정의
