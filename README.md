@@ -4,9 +4,107 @@
 
 ---
 
-### 기능
-![image](https://github.com/nermer1/unidocuExtendOptions/assets/51549944/15c463f3-ef7b-4ceb-a781-56f2ac8c4847)
+### 사용 방법
 
+[unidocuExtendOptions.1.0.0.zip](https://github.com/nermer1/unidocuExtendOptions/files/12657107/unidocuExtendOptions.1.0.0.zip)
+
+1. 다운받은 소스 압축 해제 후 vendorCustom 경로에 복사 또는 이동
+
+2. $uPlugins.js 추가
+```javascript
+//$uPlugins.js "vendorCustom/plugins/$uPlugins" 경로에 생성 후 소스 작성
+define(['vendorCustom/plugins/extendCustomWebData/main'], function () {
+    $u.plugins = {};
+    $u.plugins.extendCustomWebData = $customWebData;
+});
+```
+
+3. customize.js 파일 수정
+```javascript
+//customize.js 모듈 호출
+define(['vendorCustom/plugins/$uPlugins'], function () {
+    // ...원래 로직 가장 아래 함수 실행
+    $u.plugins.extendCustomWebData.init();
+});
+```
+
+4. buttonRole 기능을 사용한다면 다음 절차를 진행(사용하지 않으면 생략가능)
+
+core 소스
+
+unidocu-button.css
+```css
+#unipost-unidocu .unidocu-button.hidden {display: none;} -> 제거
+```
+
+unidocuButton.js
+```javascript
+// isShowRoleButton 제거
+function isShowRoleButton(os_data) {
+    var bool = false, trimSplit = function(a, b) {
+        var p = {};
+        b = '\\' + ((!b)? ',':b);
+        p['p1'] = new RegExp(b + '[' + b + '\\s]*?$', 'i');
+        p['p2'] = new RegExp('\\s*' + b + '\\s*');
+        return a.replace(p['p1'], '').split(p['p2']);
+    }
+    $.each(trimSplit(os_data['BUTTON_ROLE']), function(_, role) {
+        if(new RegExp(role, 'gi').test(staticProperties.user['ROLE'])) {
+            bool = true;
+            return false;
+        }
+    });
+    return bool;
+}
+
+$u.buttons.getSingleButtonsEl = function(os_data){
+    ... 생략
+    // 2라인 제거
+    if (!os_data['BUTTON_ROLE']) os_data['BUTTON_ROLE'] = '';
+    if (!isShowRoleButton(os_data)) os_data['VISIBLE'] = 'hidden';
+}
+
+```
+
+Uni_ButtonTemplate.mustache
+```javascript
+//아래 라인에서 {{VISIBLE}} 제거
+<button id="{{BUTTON_ID}}" class="unidocu-button {{align}} {{COLOR}} {{VISIBLE}}">{{TEXT}}</button>
+```
+
+getCustomWebData.js
+//아래 항목 찾아서 제거
+```javascript
+{
+    "FNAME": "VISIBLE",
+    "WIDTH": "100",
+    "TYPE": "customCombo",
+    "EDIT": "X",
+    "ADD_EMPTY": "X",
+    "OPTIONS": [
+        "hidden"
+    ]
+},
+{
+    "FNAME": "BUTTON_ROLE",
+    "WIDTH": "100",
+    "TYPE": "text",
+    "EDIT": "X"
+}
+```
+
+일반 소스
+
+customize.css
+```css
+// 추가
+#unipost-unidocu .unidocu-button.hidden {display: none;}
+```
+
+---
+
+### 기능 설명
+![image](https://github.com/nermer1/unidocuExtendOptions/assets/51549944/15c463f3-ef7b-4ceb-a781-56f2ac8c4847)
 
 
 ##정렬(모듈명: gridSorting)
@@ -136,105 +234,6 @@
     },
     category: buttonSetting
 }
-```
-
----
-
-### 사용
-
-[unidocuExtendOptions.1.0.0.zip](https://github.com/nermer1/unidocuExtendOptions/files/12657107/unidocuExtendOptions.1.0.0.zip)
-
-1. 다운받은 소스 압축 해제 후 vendorCustom 경로에 복사 또는 이동
-
-2. $uPlugins.js 추가
-```javascript
-//$uPlugins.js "vendorCustom/plugins/$uPlugins" 경로에 생성 후 소스 작성
-define(['vendorCustom/plugins/extendCustomWebData/main'], function () {
-    $u.plugins = {};
-    $u.plugins.extendCustomWebData = $customWebData;
-});
-```
-
-3. customize.js 파일 수정
-```javascript
-//customize.js 모듈 호출
-define(['vendorCustom/plugins/$uPlugins'], function () {
-    // ...원래 로직 가장 아래 함수 실행
-    $u.plugins.extendCustomWebData.init();
-});
-```
-
-4. buttonRole 기능을 사용한다면 다음 절차를 진행(사용하지 않으면 생략가능)
-
-core 소스
-
-unidocu-button.css
-```css
-#unipost-unidocu .unidocu-button.hidden {display: none;} -> 제거
-```
-
-unidocuButton.js
-```javascript
-// isShowRoleButton 제거
-function isShowRoleButton(os_data) {
-    var bool = false, trimSplit = function(a, b) {
-        var p = {};
-        b = '\\' + ((!b)? ',':b);
-        p['p1'] = new RegExp(b + '[' + b + '\\s]*?$', 'i');
-        p['p2'] = new RegExp('\\s*' + b + '\\s*');
-        return a.replace(p['p1'], '').split(p['p2']);
-    }
-    $.each(trimSplit(os_data['BUTTON_ROLE']), function(_, role) {
-        if(new RegExp(role, 'gi').test(staticProperties.user['ROLE'])) {
-            bool = true;
-            return false;
-        }
-    });
-    return bool;
-}
-
-$u.buttons.getSingleButtonsEl = function(os_data){
-    ... 생략
-    // 2라인 제거
-    if (!os_data['BUTTON_ROLE']) os_data['BUTTON_ROLE'] = '';
-    if (!isShowRoleButton(os_data)) os_data['VISIBLE'] = 'hidden';
-}
-
-```
-
-Uni_ButtonTemplate.mustache
-```javascript
-//아래 라인에서 {{VISIBLE}} 제거
-<button id="{{BUTTON_ID}}" class="unidocu-button {{align}} {{COLOR}} {{VISIBLE}}">{{TEXT}}</button>
-```
-
-getCustomWebData.js
-//아래 항목 찾아서 제거
-```javascript
-{
-    "FNAME": "VISIBLE",
-    "WIDTH": "100",
-    "TYPE": "customCombo",
-    "EDIT": "X",
-    "ADD_EMPTY": "X",
-    "OPTIONS": [
-        "hidden"
-    ]
-},
-{
-    "FNAME": "BUTTON_ROLE",
-    "WIDTH": "100",
-    "TYPE": "text",
-    "EDIT": "X"
-}
-```
-
-일반 소스
-
-customize.css
-```css
-// 추가
-#unipost-unidocu .unidocu-button.hidden {display: none;}
 ```
 
 ---
