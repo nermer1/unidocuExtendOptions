@@ -139,15 +139,29 @@
 
 ### 사용
 
+[unidocuExtendOptions.1.0.0.zip](https://github.com/nermer1/unidocuExtendOptions/files/12657107/unidocuExtendOptions.1.0.0.zip)
+
+1. 다운받은 소스 압축 해제 후 vendorCustom 경로에 복사 또는 이동
+
+2. $uPlugins.js 추가
 ```javascript
-//customize.js 모듈 호출
-define(['vendorCustom/extendCustomWebData'], function (extendCustomWebData) {
-    // ...원래 로직 가장 아래 함수 실행
-    extendCustomWebData();
+//$uPlugins.js "vendorCustom/plugins/$uPlugins" 경로에 생성 후 소스 작성
+define(['vendorCustom/plugins/extendCustomWebData/main'], function () {
+    $u.plugins = {};
+    $u.plugins.extendCustomWebData = $customWebData;
 });
 ```
 
-buttonRole 기능을 사용한다면 다음 절차를 진행
+3. customize.js 파일 수정
+```javascript
+//customize.js 모듈 호출
+define(['vendorCustom/plugins/$uPlugins'], function () {
+    // ...원래 로직 가장 아래 함수 실행
+    $u.plugins.extendCustomWebData.init();
+});
+```
+
+4. buttonRole 기능을 사용한다면 다음 절차를 진행(사용하지 않으면 생략가능)
 
 core 소스
 
@@ -220,7 +234,5 @@ customize.css
 #unipost-unidocu .unidocu-button.hidden {display: none;}
 ```
 
-### 다운로드
-[unidocuExtendOptions 1.0.0.zip](https://github.com/nermer1/unidocuExtendOptions/files/12616633/unidocuExtendOptions.1.0.0.zip)
 
 ### 버전 정의
