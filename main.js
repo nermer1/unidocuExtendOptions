@@ -99,432 +99,435 @@
  *
  *
  */
-const config = {
-    version: '1.0.0',
-    name: 'extendCustomWebData',
-    description: 'unidocu5 plugin, f8 option extension',
-    extraModules: ['gridSorting', 'gridSummary', 'gridTooltip', 'gridHeaderGroup', 'gridHeaderColor', 'gridRowColor', 'gridSelectedOptions', 'buttonRole']
-};
-window.$customWebData = {};
-$customWebData.getConfig = () => config;
-$customWebData.setConfig = (option) => {
-    if (Array.isArray(option) || typeof option !== 'object' || Object.keys(option).length > 1 || !option.hasOwnProperty('extraModules'))
-        throw '{extraModules: [module1, module2...]} 형태만 입력 바람.';
-    config['extraModules'] = option['extraModules'];
-};
+(function () {
+    const config = {
+        version: '1.0.0',
+        name: 'extendCustomWebData',
+        description: 'unidocu5 plugin, f8 option extension',
+        extraModules: ['gridSorting', 'gridSummary', 'gridTooltip', 'gridHeaderGroup', 'gridHeaderColor', 'gridRowColor', 'gridSelectedOptions', 'buttonRole']
+    };
+    window.$customWebData = {};
+    $customWebData.getConfig = () => config;
+    $customWebData.setConfig = (option) => {
+        if (Array.isArray(option) || typeof option !== 'object' || Object.keys(option).length > 1 || !option.hasOwnProperty('extraModules'))
+            throw '{extraModules: [module1, module2...]} 형태만 입력 바람.';
+        config['extraModules'] = option['extraModules'];
+    };
 
-$customWebData.init = function () {
-    $customWebData.module.load();
-};
+    $customWebData.init = function () {
+        $customWebData.module.load();
+    };
 
-$customWebData.moduleLoad = function (path) {
-    const extraModules = $customWebData.getConfig().extraModules;
-    extraModules.forEach((module) => $customWebData.tools.scriptLoader(path + module));
-};
+    $customWebData.moduleLoad = function (path) {
+        const extraModules = $customWebData.getConfig().extraModules;
+        extraModules.forEach((module) => $customWebData.tools.scriptLoader(path + module));
+    };
 
-$customWebData.extendWebData = function (webData) {
-    Object.keys(webData).map(function (key) {
-        if (!$u.webData.customWebDataMap[key]) throw '존재하지 않는 웹데이터 아이디';
-        if (webData[key].hasOwnProperty('OT_DATA')) webData[key]['OT_DATA'].map((data) => $u.webData.customWebDataMap[key]['OT_DATA'].push(data));
-        if (webData[key].hasOwnProperty('OS_DATA')) $customWebData.module.extend($u.webData.customWebDataMap[key]['OS_DATA'], webData[key]['OS_DATA']);
-    });
-};
+    $customWebData.extendWebData = function (webData) {
+        Object.keys(webData).map(function (key) {
+            if (!$u.webData.customWebDataMap[key]) throw '존재하지 않는 웹데이터 아이디';
+            if (webData[key].hasOwnProperty('OT_DATA')) webData[key]['OT_DATA'].map((data) => $u.webData.customWebDataMap[key]['OT_DATA'].push(data));
+            if (webData[key].hasOwnProperty('OS_DATA')) $customWebData.module.extend($u.webData.customWebDataMap[key]['OS_DATA'], webData[key]['OS_DATA']);
+        });
+    };
 
-/**
- * 여러가지 util
- */
-$customWebData.tools = {
-    scriptLoader: function (src) {
-        const script = document.createElement('script');
-        script.type = 'text/javascript';
-        script.src = src + '/module.js';
-        document.head.append(script);
+    /**
+     * 여러가지 util
+     */
+    $customWebData.tools = {
+        scriptLoader: function (src) {
+            const script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = src + '/module.js';
+            document.head.append(script);
 
-        script.onerror = (error) => console.log('존재하지 않는 모듈: ' + script.src);
-    },
-    extend: function () {
-        var o = arguments[0];
-        for (var i = 1; i < arguments.length; ++i) {
-            for (var k in arguments[i]) {
-                if (arguments[i].hasOwnProperty(k)) o[k] = arguments[i][k];
+            script.onerror = (error) => console.log('존재하지 않는 모듈: ' + script.src);
+        },
+        extend: function () {
+            var o = arguments[0];
+            for (var i = 1; i < arguments.length; ++i) {
+                for (var k in arguments[i]) {
+                    if (arguments[i].hasOwnProperty(k)) o[k] = arguments[i][k];
+                }
             }
-        }
-        return o;
-    },
-    /**
-     * 문자열 구분자로 분리 반환, 구분자 입력 시 앞뒤 공백 제거
-     *
-     * @param a {string} 자를 문자열
-     * @param b {string?} 구분자 없으면 ","
-     * @return {string[]}
-     */
-    trimSplit: (a, b) => {
-        b = !b ? ',' : b;
-        if (!a) return [];
-        return a
-            .replace(new RegExp('[\\' + b + '\\s][\\' + b + '\\s]*', 'ig'), b)
-            .replace(new RegExp('[\\' + b + '\\s]*?$', 'i'), '')
-            .split(b);
-    },
-    /**
-     * ROLE 권한 체크
-     *
-     * @param s {string} 권한이 나열된 문자열 1, 2..
-     * @param t {string} 확인할 권한
-     * @return {boolean} 권현 존재 여부 반환
-     */
-    hasRole: (s, t) => {
-        return $customWebData.tools.trimSplit(s).reduce(function (a, b) {
-            if (new RegExp('(\\s|\\,|^)' + b + '(\\s|\\,|$)', 'i').test(t)) a = true;
-            return a;
-        }, false);
-    },
-    /**
-     * 16진수{#ffffff} -> 255|255|255 타입 변환
-     *
-     * @param hexColor {string}
-     * @return {string}
-     */
-    hexColorToRgbColor: (hexColor) => {
-        if (!/^#?[a-zA-Z0-9]{6}$/.test(hexColor)) {
-            console.log('16진수 color 값 필요');
-            return hexColor;
-        }
-        return hexColor
-            .replace('#', '')
-            .match(/.{2}/g)
-            .reduce((str, color, index, array) => {
-                str += parseInt(color, 16) + (index < array.length - 1 ? '|' : '');
+            return o;
+        },
+        /**
+         * 문자열 구분자로 분리 반환, 구분자 입력 시 앞뒤 공백 제거
+         *
+         * @param a {string} 자를 문자열
+         * @param b {string?} 구분자 없으면 ","
+         * @return {string[]}
+         */
+        trimSplit: (a, b) => {
+            b = !b ? ',' : b;
+            if (!a) return [];
+            return a
+                .replace(new RegExp('[\\' + b + '\\s][\\' + b + '\\s]*', 'ig'), b)
+                .replace(new RegExp('[\\' + b + '\\s]*?$', 'i'), '')
+                .split(b);
+        },
+        /**
+         * ROLE 권한 체크
+         *
+         * @param s {string} 권한이 나열된 문자열 1, 2..
+         * @param t {string} 확인할 권한
+         * @return {boolean} 권현 존재 여부 반환
+         */
+        hasRole: (s, t) => {
+            return $customWebData.tools.trimSplit(s).reduce(function (a, b) {
+                if (new RegExp('(\\s|\\,|^)' + b + '(\\s|\\,|$)', 'i').test(t)) a = true;
+                return a;
+            }, false);
+        },
+        /**
+         * 16진수{#ffffff} -> 255|255|255 타입 변환
+         *
+         * @param hexColor {string}
+         * @return {string}
+         */
+        hexColorToRgbColor: (hexColor) => {
+            if (!/^#?[a-zA-Z0-9]{6}$/.test(hexColor)) {
+                console.log('16진수 color 값 필요');
+                return hexColor;
+            }
+            return hexColor
+                .replace('#', '')
+                .match(/.{2}/g)
+                .reduce((str, color, index, array) => {
+                    str += parseInt(color, 16) + (index < array.length - 1 ? '|' : '');
+                    return str;
+                }, '');
+        },
+        /**
+         * 255|255|255 -> 16진수{#ffffff} 타입 변환
+         *
+         * @param rgbColor {string}
+         * @return {string}
+         */
+        rgbColorToHexColor: (rgbColor) => {
+            if (!/^\d{1,3}\|\d{1,3}\|\d{1,3}$/.test(rgbColor)) {
+                console.log('R|G|B 10진수값 필요');
+                return rgbColor;
+            }
+            return rgbColor.split('|').reduce((str, color, index) => {
+                str += (index === 0 ? '#' : '') + parseInt(color).toString(16);
                 return str;
             }, '');
-    },
-    /**
-     * 255|255|255 -> 16진수{#ffffff} 타입 변환
-     *
-     * @param rgbColor {string}
-     * @return {string}
-     */
-    rgbColorToHexColor: (rgbColor) => {
-        if (!/^\d{1,3}\|\d{1,3}\|\d{1,3}$/.test(rgbColor)) {
-            console.log('R|G|B 10진수값 필요');
-            return rgbColor;
+        },
+        isEmptyObject: (o = {}) => {
+            return Object.keys(o).length === 0;
+        },
+        /**
+         * 숨겨진 컬럼을 제외하고 보이는 컬럼명만 가져온다
+         *
+         * @param gridObj {object}
+         * @return {string[]}
+         */
+        getVisibleGridColumnKeys: (gridObj) => {
+            return gridObj.getGridHeaders().reduce((keys, column) => {
+                if (!gridObj.rg.style.isColumnHide(column['key'])) keys.push(column['key']);
+                return keys;
+            }, []);
+        },
+        /**
+         * 정렬 등으로 인해 위치가 변경된 경우 실제 데이터 위치값을 가져온다
+         *
+         * @param gridObj {object}
+         * @param rowIndex {number|string}
+         * @return {number}
+         */
+        originalRowIndex: (gridObj, rowIndex) => {
+            return gridObj._rg.gridView.getValues(rowIndex)['__rowId'];
         }
-        return rgbColor.split('|').reduce((str, color, index) => {
-            str += (index === 0 ? '#' : '') + parseInt(color).toString(16);
-            return str;
-        }, '');
-    },
-    isEmptyObject: (o = {}) => {
-        return Object.keys(o).length === 0;
-    },
-    /**
-     * 숨겨진 컬럼을 제외하고 보이는 컬럼명만 가져온다
-     *
-     * @param gridObj {object}
-     * @return {string[]}
-     */
-    getVisibleGridColumnKeys: (gridObj) => {
-        return gridObj.getGridHeaders().reduce((keys, column) => {
-            if (!gridObj.rg.style.isColumnHide(column['key'])) keys.push(column['key']);
-            return keys;
-        }, []);
-    },
-    /**
-     * 정렬 등으로 인해 위치가 변경된 경우 실제 데이터 위치값을 가져온다
-     *
-     * @param gridObj {object}
-     * @param rowIndex {number|string}
-     * @return {number}
-     */
-    originalRowIndex: (gridObj, rowIndex) => {
-        return gridObj._rg.gridView.getValues(rowIndex)['__rowId'];
-    }
-};
-
-/**
- * form type이 Uni_Empty인 경우 웹데이타 아이디 "SUB_COLUMN_TYPE" 값에 따른 form 추가
- *
- * SUB_COLUMN_TYPE - colorPicker: html default color picker type
- * SUB_COLUMN_TYPE - jsonEditor: jsonEditor type
- * @see: $u.dialog.JSONInputDialog
- */
-$customWebData.customInputManager = function () {
-    this.getEl = function (column) {
-        const $el = $u.get(column);
-        if (!$el) throw '존재하지 않는 필드';
-        return $el;
     };
-    this.init = function () {
-        $u.webData.formSetting.getData('gridSetting@form-data')['OT_DATA'].map((data) => {
-            if (data['COLUMN_TYPE'] === 'Uni_Empty') this[data['SUB_COLUMN_TYPE']].call(this, data['COLUMN_ID']);
+
+    /**
+     * form type이 Uni_Empty인 경우 웹데이타 아이디 "SUB_COLUMN_TYPE" 값에 따른 form 추가
+     *
+     * SUB_COLUMN_TYPE - colorPicker: html default color picker type
+     * SUB_COLUMN_TYPE - jsonEditor: jsonEditor type
+     * @see: $u.dialog.JSONInputDialog
+     */
+    $customWebData.customInputManager = function () {
+        this.getEl = function (column) {
+            const $el = $u.get(column);
+            if (!$el) throw '존재하지 않는 필드';
+            return $el;
+        };
+        this.init = function () {
+            $u.webData.formSetting.getData('gridSetting@form-data')['OT_DATA'].map((data) => {
+                if (data['COLUMN_TYPE'] === 'Uni_Empty') this[data['SUB_COLUMN_TYPE']].call(this, data['COLUMN_ID']);
+            });
+        };
+    };
+
+    /**
+     * SUB_COLUMN_TYPE에 대한 초기화
+     *
+     * $u.get(form) getValue, setValue를 가져올 수 있도록 함수 재정의
+     */
+    $customWebData.customInputManager.prototype = {
+        colorPicker: function (column) {
+            let $self = this.getEl(column),
+                defalutValue = {},
+                $input;
+
+            $self.init = function () {
+                $input = [];
+                $self.params.options.map(function (item, index) {
+                    $self.$el.append(item['element']);
+                    const colorPicker = $($self.$el.find(`input:eq(${index})`));
+                    const span = $($self.$el.find(`span:eq(${index})`));
+                    colorPicker.attr('name', item['key']);
+                    $input.push(colorPicker);
+                    defalutValue[item['key']] = item['defalutValue'];
+                    span.data('defalut', defalutValue[item['key']]);
+                    span.click(() => {
+                        colorPicker.val(span.data('defalut'));
+                    });
+                });
+                $self.setValue(defalutValue);
+            };
+
+            $self.getValue = function () {
+                return $input.reduce((data, input) => {
+                    data[input.attr('name')] = input.val();
+                    return data;
+                }, {});
+            };
+
+            $self.setValue = function (value) {
+                $input.map((input) => {
+                    input.val(value[input.attr('name')]);
+                });
+            };
+
+            $self.init();
+        },
+        jsonEditor: function (column) {
+            let $self = this.getEl(column),
+                $input;
+
+            $self.init = function () {
+                $self.$el.append('<div class="input-box"><input type="text" readonly/></div>');
+                $input = $self.$el.find('input');
+                $input.click(function () {
+                    $u.dialog.JSONInputDialog.open(function (data) {
+                        $self.setValue(data);
+                    }, $self.getValue());
+                });
+            };
+
+            $self.getValue = function () {
+                return $input.val() ? JSON.parse($input.val()) : {};
+            };
+
+            $self.setValue = function (value) {
+                value = value ? JSON.stringify(value) : '';
+                $input.val(value);
+            };
+
+            $self.init();
+        }
+    };
+    $customWebData.customInput = new $customWebData.customInputManager();
+
+    $customWebData.moduleManager = function (path) {
+        this.basePath = path;
+        this.modules = {};
+    };
+    $customWebData.moduleManager.prototype = {
+        add: function (data) {
+            let name = data['moduleName'],
+                module;
+            if (this.modules[name]) throw `모듈 ${name}(이/가) 중복 등록 불가`;
+            module = this.modules[name] = data || {};
+            module.path = this.basePath + name;
+            $customWebData.extendWebData(data['webData']);
+            if (typeof data['init'] === 'function') data['init'].call(this);
+        },
+        load: function () {
+            $customWebData.moduleLoad(this.basePath);
+        },
+        getModule: function (moduleName) {
+            if (!this.hasModule(moduleName)) throw `모듈 ${moduleName}(이/가) 존재하지 않음`;
+            return this.modules[moduleName]['method'];
+        },
+        hasModule: function (moduleName) {
+            return !!this.modules[moduleName];
+        },
+        setOptions: function (gridObj, os_data) {
+            customizeBindExtendAPI(gridObj);
+            Object.keys(this.modules).map((key) => {
+                const fn = this.modules[key]['method']['setOptions'];
+                if (typeof fn === 'function') fn(gridObj, os_data);
+            });
+        }
+    };
+    $customWebData.module = new $customWebData.moduleManager('/webjars/vendorCustom/plugins/extendCustomWebData/modules/');
+
+    // button
+    // customize.css
+    /**
+     * $u.buttons.getFormButtonsEl 재정의
+     *
+     * @param ot_data 저장된 웹데이터
+     * @return 처리된 버튼 객체
+     */
+    $u.buttons.getFormButtonsEl = function (ot_data) {
+        let $buttons = [];
+        $.each(ot_data, function (index, os_data) {
+            if (os_data['NOT_IN_USE'] === '1') return true;
+            if ($customWebData.module.hasModule('buttonRole')) {
+                if (!$customWebData.module.getModule('buttonRole').isShowRoleButton(os_data)) return true;
+            }
+            $buttons.push($u.buttons.getSingleButtonsEl(os_data));
+            $($buttons[index]).addClass(os_data['VISIBLE']);
         });
+        return $buttons;
     };
-};
 
-/**
- * SUB_COLUMN_TYPE에 대한 초기화
- *
- * $u.get(form) getValue, setValue를 가져올 수 있도록 함수 재정의
- */
-$customWebData.customInputManager.prototype = {
-    colorPicker: function (column) {
-        let $self = this.getEl(column),
-            defalutValue = {},
-            $input;
+    /**
+     * _onRowActivate, setGroupHeader 재정의
+     *
+     * @param gridObj 그리드 객체
+     */
+    function customizeBindExtendAPI(gridObj) {
+        gridObj.setCheckBarAsRadio = function (columnKey, useAsRadio) {
+            if ($customWebData.module.hasModule('gridSelectedOptions')) {
+                var module = $customWebData.module.getModule('gridSelectedOptions');
+                if (module.option.isForce) useAsRadio = module.option.isRadio;
+            }
+            gridObj._rg.setCheckBar({
+                exclusive: useAsRadio === null || useAsRadio === undefined ? true : useAsRadio
+            });
+        };
+        gridObj.setHeaderCheckBox = function (columnKey, useHeaderCheckbox) {
+            if ($customWebData.module.hasModule('gridSelectedOptions')) {
+                var module = $customWebData.module.getModule('gridSelectedOptions');
+                if (module.option.isForce) useHeaderCheckbox = module.option.isCheckAll;
+            }
+            gridObj._rg.setCheckBar({showAll: useHeaderCheckbox});
+        };
+        gridObj.setColumnHide = function (columnKey, isHide) {
+            if ($customWebData.module.hasModule('gridSelectedOptions')) {
+                var module = $customWebData.module.getModule('gridSelectedOptions');
+                if (module.option.isForce) isHide = module.option.isHide;
+            }
+            var visible = isHide === false;
+            if (columnKey === 'SELECTED') gridObj._rg.setCheckBar({visible: visible});
+            else gridObj._rg.setColumnProperty(columnKey, 'visible', visible);
 
-        $self.init = function () {
-            $input = [];
-            $self.params.options.map(function (item, index) {
-                $self.$el.append(item['element']);
-                const colorPicker = $($self.$el.find(`input:eq(${index})`));
-                const span = $($self.$el.find(`span:eq(${index})`));
-                colorPicker.attr('name', item['key']);
-                $input.push(colorPicker);
-                defalutValue[item['key']] = item['defalutValue'];
-                span.data('defalut', defalutValue[item['key']]);
-                span.click(() => {
-                    colorPicker.val(span.data('defalut'));
+            if (gridObj.getGridHeader(columnKey) && gridObj.getGridHeader(columnKey)['serverType'] === 'popup') {
+                gridObj._rg.setColumnProperty(columnKey + '_', 'visible', visible);
+                gridObj._rg.setColumnProperty(columnKey + '_TXT', 'visible', visible);
+            }
+        };
+        gridObj.setSortEnable = function (enable) {
+            if ($customWebData.module.hasModule('gridSorting')) {
+                var module = $customWebData.module.getModule('gridSorting');
+                if (module.option.isForce) enable = module.option.isSort;
+            }
+            gridObj._rg.setSortingOptions({enabled: enable});
+        };
+        gridObj._onRowActivate = function (rowIndex) {
+            gridObj['__onRowActivate'].apply(this, arguments);
+            if ($customWebData.module.hasModule('gridRowColor')) $customWebData.module.getModule('gridRowColor').changeBgColorHandler(gridObj, rowIndex);
+        };
+        gridObj.setGroupHeader = function (groupInfo) {
+            gridObj.groupInfo = $.extend(true, [], groupInfo);
+            gridObj.columnsKeyGroupIndexMap = {};
+            $.each(gridObj.groupInfo, function (index, item) {
+                $.each(item['childColumns'], function (index2, item2) {
+                    let gridHeader = gridObj.getGridHeader(item2);
+                    if (!gridHeader) throw item2 + ' grid header undefined.';
+                    if (!item.subColumns) item.subColumns = [];
+                    item.subColumns.push($.extend(true, {}, gridHeader));
+                    gridObj.columnsKeyGroupIndexMap[gridHeader.key] = index;
                 });
             });
-            $self.setValue(defalutValue);
-        };
-
-        $self.getValue = function () {
-            return $input.reduce((data, input) => {
-                data[input.attr('name')] = input.val();
-                return data;
-            }, {});
-        };
-
-        $self.setValue = function (value) {
-            $input.map((input) => {
-                input.val(value[input.attr('name')]);
+            let headers = gridObj.rg._gridHeadersToRealGridHeaders(gridObj.getGridHeaders(), gridObj.getRealGridUserDateFormat());
+            let groupHeaderTemplate = {
+                type: 'group',
+                orientation: 'horizontal',
+                width: 0,
+                columns: []
+            };
+            let groupHeaders = [];
+            gridObj.groupIndexGroupHeaderMap = {};
+            $.each(headers, function (index, item) {
+                let groupIndex = gridObj.columnsKeyGroupIndexMap[item.fieldName];
+                if (groupIndex === undefined) {
+                    groupHeaders.push(item);
+                    return true;
+                }
+                if (!gridObj.groupIndexGroupHeaderMap[groupIndex]) {
+                    let groupHeader = $.extend(true, {name: groupInfo[groupIndex]['groupText']}, groupHeaderTemplate);
+                    gridObj.groupIndexGroupHeaderMap[groupIndex] = groupHeader;
+                    groupHeaders.push(groupHeader);
+                }
+                gridObj.groupIndexGroupHeaderMap[groupIndex].columns.push(item);
+                gridObj.groupIndexGroupHeaderMap[groupIndex].width += Number(item.width);
             });
-        };
-
-        $self.init();
-    },
-    jsonEditor: function (column) {
-        let $self = this.getEl(column),
-            $input;
-
-        $self.init = function () {
-            $self.$el.append('<div class="input-box"><input type="text" readonly/></div>');
-            $input = $self.$el.find('input');
-            $input.click(function () {
-                $u.dialog.JSONInputDialog.open(function (data) {
-                    $self.setValue(data);
-                }, $self.getValue());
+            gridObj._rg.setColumns(groupHeaders);
+            $.each(gridObj.getGridHeaders(), function (index, header) {
+                if ($.type(header['combos']) === 'array') gridObj.setComboOptions(header.key, header['combos']);
             });
-        };
+            gridObj.rg._applyGridFormat();
+            gridObj.setGridNumberPrecision($u.unidocuCurrency.getSystemPrecision());
 
-        $self.getValue = function () {
-            return $input.val() ? JSON.parse($input.val()) : {};
+            var os_data = $u.webData.gridSetting.getData($u.webData.getWEB_DATA_ID([$u.page.getPROGRAM_ID(), $(gridObj).data('subId')]))['OS_DATA'];
+            if ($customWebData.module.hasModule('gridHeaderColor')) $customWebData.module.getModule('gridHeaderColor').setOptions(gridObj, os_data);
+            if ($customWebData.module.hasModule('gridTooltip')) $customWebData.module.getModule('gridTooltip').setOptions(gridObj, os_data);
         };
-
-        $self.setValue = function (value) {
-            value = value ? JSON.stringify(value) : '';
-            $input.val(value);
-        };
-
-        $self.init();
     }
-};
-$customWebData.customInput = new $customWebData.customInputManager();
 
-$customWebData.moduleManager = function (path) {
-    this.basePath = path;
-    this.modules = {};
-};
-$customWebData.moduleManager.prototype = {
-    add: function (data) {
-        let name = data['moduleName'],
-            module;
-        if (this.modules[name]) throw `모듈 ${name}(이/가) 중복 등록 불가`;
-        module = this.modules[name] = data || {};
-        module.path = this.basePath + name;
-        $customWebData.extendWebData(data['webData']);
-        if (typeof data['init'] === 'function') data['init'].call(this);
-    },
-    load: function () {
-        $customWebData.moduleLoad(this.basePath);
-    },
-    getModule: function (moduleName) {
-        if (!this.hasModule(moduleName)) throw `모듈 ${moduleName}(이/가) 존재하지 않음`;
-        return this.modules[moduleName]['method'];
-    },
-    hasModule: function (moduleName) {
-        return !!this.modules[moduleName];
-    },
-    setOptions: function (gridObj, os_data) {
-        customizeBindExtendAPI(gridObj);
-        Object.keys(this.modules).map((key) => {
-            const fn = this.modules[key]['method']['setOptions'];
-            if (typeof fn === 'function') fn(gridObj, os_data);
-        });
-    }
-};
-$customWebData.module = new $customWebData.moduleManager('/webjars/vendorCustom/plugins/extendCustomWebData/modules/');
+    /**
+     * $u.webData.ignoreCacheSelectOne 재정의
+     *
+     * @param scope F8 setting 영역
+     * @param web_data_id F8 웹데이터 아이디
+     * @param callback 콜백함수
+     */
+    $u.webData.ignoreCacheSelectOne = function (scope, web_data_id, callback) {
+        if ($u.webData.hasCustomWebData(web_data_id)) {
+            callback($u.webData.getCustomWebData(web_data_id));
+            return;
+        }
 
-// button
-// customize.css
-/**
- * $u.buttons.getFormButtonsEl 재정의
- *
- * @param ot_data 저장된 웹데이터
- * @return 처리된 버튼 객체
- */
-$u.buttons.getFormButtonsEl = function (ot_data) {
-    let $buttons = [];
-    $.each(ot_data, function (index, os_data) {
-        if (os_data['NOT_IN_USE'] === '1') return true;
-        if ($customWebData.module.hasModule('buttonRole')) {
-            if (!$customWebData.module.getModule('buttonRole').isShowRoleButton(os_data)) return true;
-        }
-        $buttons.push($u.buttons.getSingleButtonsEl(os_data));
-        $($buttons[index]).addClass(os_data['VISIBLE']);
-    });
-    return $buttons;
-};
-
-/**
- * _onRowActivate, setGroupHeader 재정의
- *
- * @param gridObj 그리드 객체
- */
-function customizeBindExtendAPI(gridObj) {
-    gridObj.setCheckBarAsRadio = function (columnKey, useAsRadio) {
-        if ($customWebData.module.hasModule('gridSelectedOptions')) {
-            var module = $customWebData.module.getModule('gridSelectedOptions');
-            if (module.option.isForce) useAsRadio = module.option.isRadio;
-        }
-        gridObj._rg.setCheckBar({
-            exclusive: useAsRadio === null || useAsRadio === undefined ? true : useAsRadio
-        });
-    };
-    gridObj.setHeaderCheckBox = function (columnKey, useHeaderCheckbox) {
-        if ($customWebData.module.hasModule('gridSelectedOptions')) {
-            var module = $customWebData.module.getModule('gridSelectedOptions');
-            if (module.option.isForce) useHeaderCheckbox = module.option.isCheckAll;
-        }
-        gridObj._rg.setCheckBar({showAll: useHeaderCheckbox});
-    };
-    gridObj.setColumnHide = function (columnKey, isHide) {
-        if ($customWebData.module.hasModule('gridSelectedOptions')) {
-            var module = $customWebData.module.getModule('gridSelectedOptions');
-            if (module.option.isForce) isHide = module.option.isHide;
-        }
-        var visible = isHide === false;
-        if (columnKey === 'SELECTED') gridObj._rg.setCheckBar({visible: visible});
-        else gridObj._rg.setColumnProperty(columnKey, 'visible', visible);
-
-        if (gridObj.getGridHeader(columnKey) && gridObj.getGridHeader(columnKey)['serverType'] === 'popup') {
-            gridObj._rg.setColumnProperty(columnKey + '_', 'visible', visible);
-            gridObj._rg.setColumnProperty(columnKey + '_TXT', 'visible', visible);
-        }
-    };
-    gridObj.setSortEnable = function (enable) {
-        if ($customWebData.module.hasModule('gridSorting')) {
-            var module = $customWebData.module.getModule('gridSorting');
-            if (module.option.isForce) enable = module.option.isSort;
-        }
-        gridObj._rg.setSortingOptions({enabled: enable});
-    };
-    gridObj._onRowActivate = function (rowIndex) {
-        gridObj['__onRowActivate'].apply(this, arguments);
-        if ($customWebData.module.hasModule('gridRowColor')) $customWebData.module.getModule('gridRowColor').changeBgColorHandler(gridObj, rowIndex);
-    };
-    gridObj.setGroupHeader = function (groupInfo) {
-        gridObj.groupInfo = $.extend(true, [], groupInfo);
-        gridObj.columnsKeyGroupIndexMap = {};
-        $.each(gridObj.groupInfo, function (index, item) {
-            $.each(item['childColumns'], function (index2, item2) {
-                let gridHeader = gridObj.getGridHeader(item2);
-                if (!gridHeader) throw item2 + ' grid header undefined.';
-                if (!item.subColumns) item.subColumns = [];
-                item.subColumns.push($.extend(true, {}, gridHeader));
-                gridObj.columnsKeyGroupIndexMap[gridHeader.key] = index;
-            });
-        });
-        let headers = gridObj.rg._gridHeadersToRealGridHeaders(gridObj.getGridHeaders(), gridObj.getRealGridUserDateFormat());
-        let groupHeaderTemplate = {
-            type: 'group',
-            orientation: 'horizontal',
-            width: 0,
-            columns: []
+        var importParam = {
+            MODE: 'selectOne',
+            SCOPE: scope,
+            WEB_DATA_ID: web_data_id
         };
-        let groupHeaders = [];
-        gridObj.groupIndexGroupHeaderMap = {};
-        $.each(headers, function (index, item) {
-            let groupIndex = gridObj.columnsKeyGroupIndexMap[item.fieldName];
-            if (groupIndex === undefined) {
-                groupHeaders.push(item);
-                return true;
+        $nst.is_data_os_data('ZUNIECM_WEB_DATA', importParam, function (os_data) {
+            var data = $u.webData.getSingleSafeData(os_data['DATA']);
+            callback(data);
+            if (scope === 'gridSetting') {
+                if ($customWebData.module.hasModule('gridSorting'))
+                    $customWebData.module.getModule('gridSorting').changeHandler(data['OS_DATA']['SORTING_NOT_USED']);
+                if ($customWebData.module.hasModule('gridSummary'))
+                    $customWebData.module.getModule('gridSummary').changeHandler(data['OS_DATA']['USE_SUMMARY']);
             }
-            if (!gridObj.groupIndexGroupHeaderMap[groupIndex]) {
-                let groupHeader = $.extend(true, {name: groupInfo[groupIndex]['groupText']}, groupHeaderTemplate);
-                gridObj.groupIndexGroupHeaderMap[groupIndex] = groupHeader;
-                groupHeaders.push(groupHeader);
-            }
-            gridObj.groupIndexGroupHeaderMap[groupIndex].columns.push(item);
-            gridObj.groupIndexGroupHeaderMap[groupIndex].width += Number(item.width);
         });
-        gridObj._rg.setColumns(groupHeaders);
-        $.each(gridObj.getGridHeaders(), function (index, header) {
-            if ($.type(header['combos']) === 'array') gridObj.setComboOptions(header.key, header['combos']);
-        });
-        gridObj.rg._applyGridFormat();
-        gridObj.setGridNumberPrecision($u.unidocuCurrency.getSystemPrecision());
-
-        var os_data = $u.webData.gridSetting.getData($u.webData.getWEB_DATA_ID([$u.page.getPROGRAM_ID(), $(gridObj).data('subId')]))['OS_DATA'];
-        if ($customWebData.module.hasModule('gridHeaderColor')) $customWebData.module.getModule('gridHeaderColor').setOptions(gridObj, os_data);
-        if ($customWebData.module.hasModule('gridTooltip')) $customWebData.module.getModule('gridTooltip').setOptions(gridObj, os_data);
     };
-}
 
-/**
- * $u.webData.ignoreCacheSelectOne 재정의
- *
- * @param scope F8 setting 영역
- * @param web_data_id F8 웹데이터 아이디
- * @param callback 콜백함수
- */
-$u.webData.ignoreCacheSelectOne = function (scope, web_data_id, callback) {
-    if ($u.webData.hasCustomWebData(web_data_id)) {
-        callback($u.webData.getCustomWebData(web_data_id));
-        return;
-    }
-
-    var importParam = {
-        MODE: 'selectOne',
-        SCOPE: scope,
-        WEB_DATA_ID: web_data_id
-    };
-    $nst.is_data_os_data('ZUNIECM_WEB_DATA', importParam, function (os_data) {
-        var data = $u.webData.getSingleSafeData(os_data['DATA']);
-        callback(data);
-        if (scope === 'gridSetting') {
-            if ($customWebData.module.hasModule('gridSorting'))
-                $customWebData.module.getModule('gridSorting').changeHandler(data['OS_DATA']['SORTING_NOT_USED']);
-            if ($customWebData.module.hasModule('gridSummary')) $customWebData.module.getModule('gridSummary').changeHandler(data['OS_DATA']['USE_SUMMARY']);
+    // render custom
+    const _renderUIComponents = $u.renderUIComponents;
+    $u.renderUIComponents = function ($scope, subGroup, customParam) {
+        _renderUIComponents($scope, subGroup, customParam);
+        if (subGroup === 'gridSetting') {
+            if ($customWebData.module.hasModule('gridSorting')) $customWebData.module.getModule('gridSorting').addEvent();
+            if ($customWebData.module.hasModule('gridSummary')) $customWebData.module.getModule('gridSummary').addEvent();
+            $customWebData.customInput.init();
         }
-    });
-};
+    };
 
-// render custom
-const _renderUIComponents = $u.renderUIComponents;
-$u.renderUIComponents = function ($scope, subGroup, customParam) {
-    _renderUIComponents($scope, subGroup, customParam);
-    if (subGroup === 'gridSetting') {
-        if ($customWebData.module.hasModule('gridSorting')) $customWebData.module.getModule('gridSorting').addEvent();
-        if ($customWebData.module.hasModule('gridSummary')) $customWebData.module.getModule('gridSummary').addEvent();
-        $customWebData.customInput.init();
-    }
-};
-
-// grid custom
-const _renderGridSingle = $u.renderGridSingle;
-$u.renderGridSingle = function (gridObj, subGroup) {
-    _renderGridSingle(gridObj, subGroup);
-    $customWebData.module.setOptions(gridObj, $u.webData.gridSetting.getData($u.webData.getWEB_DATA_ID([subGroup, $(gridObj).data('subId')]))['OS_DATA']);
-};
+    // grid custom
+    const _renderGridSingle = $u.renderGridSingle;
+    $u.renderGridSingle = function (gridObj, subGroup) {
+        _renderGridSingle(gridObj, subGroup);
+        $customWebData.module.setOptions(gridObj, $u.webData.gridSetting.getData($u.webData.getWEB_DATA_ID([subGroup, $(gridObj).data('subId')]))['OS_DATA']);
+    };
+})();
