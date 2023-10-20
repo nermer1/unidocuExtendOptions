@@ -3,7 +3,7 @@
  *
  */
 (function () {
-    var info = {
+    const info = {
         version: '1.0.0',
         category: 'gridSetting',
         moduleName: 'gridTooltip',

@@ -104,26 +104,31 @@
         version: '1.0.0',
         name: 'extendCustomWebData',
         description: 'unidocu5 plugin, f8 option extension',
+        basePath: '/extendCustomWebData/modules/',
         extraModules: ['gridSorting', 'gridSummary', 'gridTooltip', 'gridHeaderGroup', 'gridHeaderColor', 'gridRowColor', 'gridSelectedOptions', 'buttonRole']
     };
     window.$customWebData = {};
     $customWebData.getConfig = () => config;
-    $customWebData.setConfig = (option) => {
-        if (Array.isArray(option) || typeof option !== 'object' || Object.keys(option).length > 1 || !option.hasOwnProperty('extraModules'))
-            throw '{extraModules: [module1, module2...]} 형태만 입력 바람.';
-        config['extraModules'] = option['extraModules'];
+    $customWebData.setExtraModules = (modules) => {
+        if (!Array.isArray(modules)) throw '배열로 입력';
+        config['extraModules'] = modules;
+    };
+    $customWebData.setBasePath = (basePath) => {
+        if (typeof basePath !== 'string') throw '배열로 입력';
+        config['basePath'] = basePath;
     };
 
-    $customWebData.init = function () {
+    $customWebData.init = () => {
+        $customWebData.module = new $customWebData.moduleManager(config.basePath);
         $customWebData.module.load();
     };
 
-    $customWebData.moduleLoad = function (path) {
+    $customWebData.moduleLoad = (path) => {
         const extraModules = $customWebData.getConfig().extraModules;
         extraModules.forEach((module) => $customWebData.tools.scriptLoader(path + module));
     };
 
-    $customWebData.extendWebData = function (webData) {
+    $customWebData.extendWebData = (webData) => {
         Object.keys(webData).map(function (key) {
             if (!$u.webData.customWebDataMap[key]) throw '존재하지 않는 웹데이터 아이디';
             if (webData[key].hasOwnProperty('OT_DATA')) webData[key]['OT_DATA'].map((data) => $u.webData.customWebDataMap[key]['OT_DATA'].push(data));
@@ -135,7 +140,7 @@
      * 여러가지 util
      */
     $customWebData.tools = {
-        scriptLoader: function (src) {
+        scriptLoader: (src) => {
             const script = document.createElement('script');
             script.type = 'text/javascript';
             script.src = src + '/module.js';
@@ -143,7 +148,7 @@
 
             script.onerror = (error) => console.log('존재하지 않는 모듈: ' + script.src);
         },
-        extend: function () {
+        extend: () => {
             var o = arguments[0];
             for (var i = 1; i < arguments.length; ++i) {
                 for (var k in arguments[i]) {
@@ -334,7 +339,7 @@
     $customWebData.customInput = new $customWebData.customInputManager();
 
     $customWebData.moduleManager = function (path) {
-        this.basePath = path;
+        this.basePath = (/[\\/]/.test(path.substr(-1)) ? path : path + '/') + config.name + '/modules/';
         this.modules = {};
     };
     $customWebData.moduleManager.prototype = {
@@ -365,7 +370,6 @@
             });
         }
     };
-    $customWebData.module = new $customWebData.moduleManager('/webjars/vendorCustom/plugins/extendCustomWebData/modules/');
 
     // button
     // customize.css
