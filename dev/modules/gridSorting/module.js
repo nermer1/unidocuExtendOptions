@@ -3,7 +3,7 @@
  *
  */
 (function () {
-    var info = {
+    const info = {
         version: '1.0.0',
         category: 'gridSetting',
         moduleName: 'gridSorting',
@@ -47,7 +47,7 @@
                 used = used || '';
                 var formId = 'SORTING_MODE';
                 if (!$u.get(formId)) return;
-                if (!!used.match('A')) $u.get(formId).setReadOnly(true);
+                if (used.match('A')) $u.get(formId).setReadOnly(true);
                 else $u.get(formId).setReadOnly(false);
             },
             addEvent: function () {

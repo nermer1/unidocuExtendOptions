@@ -1,5 +1,5 @@
 /**
- * @namespace extendCustomWebData
+ * @namespace unidocuOptionExpansion
  * @version 1.0.0
  *
  * F8 gridSetting, formSetting, buttonSetting에 대한 옵션 확장
@@ -8,9 +8,9 @@
  *
  * 사용법:
  *
- * customize.js vendorCustom/extendCustomWebData 모듈 로드
+ * customize.js vendorCustom/plugins/$uPlugins 모듈 로드
  * config-extraModules: module 등록된 모듈을 로드한다.
- * module의 기본 경로는 extend 폴더를 참조한다.
+ * module의 기본 경로는 /webjars/vendorCustom/plugins/ 폴더를 참조한다.
  *
  * customize 경고
  * 아래 5영역은 원래 내용 재정의 하므로 코어나, customize에 수정이 된 경우는 확인 필요함
@@ -102,9 +102,9 @@
 (function () {
     const config = {
         version: '1.0.0',
-        name: 'extendCustomWebData',
+        name: 'unidocuOptionExpansion',
         description: 'unidocu5 plugin, f8 option extension',
-        basePath: '/extendCustomWebData/modules/',
+        basePath: '/unidocuOptionExpansion/modules/',
         extraModules: ['gridSorting', 'gridSummary', 'gridTooltip', 'gridHeaderGroup', 'gridHeaderColor', 'gridRowColor', 'gridSelectedOptions', 'buttonRole']
     };
     window.$customWebData = {};
@@ -131,8 +131,10 @@
     $customWebData.extendWebData = (webData) => {
         Object.keys(webData).map(function (key) {
             if (!$u.webData.customWebDataMap[key]) throw '존재하지 않는 웹데이터 아이디';
-            if (webData[key].hasOwnProperty('OT_DATA')) webData[key]['OT_DATA'].map((data) => $u.webData.customWebDataMap[key]['OT_DATA'].push(data));
-            if (webData[key].hasOwnProperty('OS_DATA')) $customWebData.module.extend($u.webData.customWebDataMap[key]['OS_DATA'], webData[key]['OS_DATA']);
+            if (Object.prototype.hasOwnProperty.call(webData[key], 'OT_DATA'))
+                webData[key]['OT_DATA'].map((data) => $u.webData.customWebDataMap[key]['OT_DATA'].push(data));
+            if (Object.prototype.hasOwnProperty.call(webData[key], 'OS_DATA'))
+                $customWebData.module.extend($u.webData.customWebDataMap[key]['OS_DATA'], webData[key]['OS_DATA']);
         });
     };
 
@@ -146,13 +148,16 @@
             script.src = src + '/module.js';
             document.head.append(script);
 
-            script.onerror = (error) => console.log('존재하지 않는 모듈: ' + script.src);
+            script.onerror = (error) => {
+                console.debug(error);
+                console.log('존재하지 않는 모듈: ' + script.src);
+            };
         },
         extend: () => {
-            var o = arguments[0];
-            for (var i = 1; i < arguments.length; ++i) {
-                for (var k in arguments[i]) {
-                    if (arguments[i].hasOwnProperty(k)) o[k] = arguments[i][k];
+            const o = arguments[0];
+            for (let i = 1; i < arguments.length; ++i) {
+                for (let k in arguments[i]) {
+                    if (Object.prototype.hasOwnProperty.call(arguments[i], k)) o[k] = arguments[i][k];
                 }
             }
             return o;
@@ -400,7 +405,7 @@
     function customizeBindExtendAPI(gridObj) {
         gridObj.setCheckBarAsRadio = function (columnKey, useAsRadio) {
             if ($customWebData.module.hasModule('gridSelectedOptions')) {
-                var module = $customWebData.module.getModule('gridSelectedOptions');
+                const module = $customWebData.module.getModule('gridSelectedOptions');
                 if (module.option.isForce) useAsRadio = module.option.isRadio;
             }
             gridObj._rg.setCheckBar({
@@ -409,17 +414,17 @@
         };
         gridObj.setHeaderCheckBox = function (columnKey, useHeaderCheckbox) {
             if ($customWebData.module.hasModule('gridSelectedOptions')) {
-                var module = $customWebData.module.getModule('gridSelectedOptions');
+                const module = $customWebData.module.getModule('gridSelectedOptions');
                 if (module.option.isForce) useHeaderCheckbox = module.option.isCheckAll;
             }
             gridObj._rg.setCheckBar({showAll: useHeaderCheckbox});
         };
         gridObj.setColumnHide = function (columnKey, isHide) {
             if ($customWebData.module.hasModule('gridSelectedOptions')) {
-                var module = $customWebData.module.getModule('gridSelectedOptions');
+                const module = $customWebData.module.getModule('gridSelectedOptions');
                 if (module.option.isForce) isHide = module.option.isHide;
             }
-            var visible = isHide === false;
+            const visible = isHide === false;
             if (columnKey === 'SELECTED') gridObj._rg.setCheckBar({visible: visible});
             else gridObj._rg.setColumnProperty(columnKey, 'visible', visible);
 
@@ -430,7 +435,7 @@
         };
         gridObj.setSortEnable = function (enable) {
             if ($customWebData.module.hasModule('gridSorting')) {
-                var module = $customWebData.module.getModule('gridSorting');
+                const module = $customWebData.module.getModule('gridSorting');
                 if (module.option.isForce) enable = module.option.isSort;
             }
             gridObj._rg.setSortingOptions({enabled: enable});
@@ -481,7 +486,7 @@
             gridObj.rg._applyGridFormat();
             gridObj.setGridNumberPrecision($u.unidocuCurrency.getSystemPrecision());
 
-            var os_data = $u.webData.gridSetting.getData($u.webData.getWEB_DATA_ID([$u.page.getPROGRAM_ID(), $(gridObj).data('subId')]))['OS_DATA'];
+            const os_data = $u.webData.gridSetting.getData($u.webData.getWEB_DATA_ID([$u.page.getPROGRAM_ID(), $(gridObj).data('subId')]))['OS_DATA'];
             if ($customWebData.module.hasModule('gridHeaderColor')) $customWebData.module.getModule('gridHeaderColor').setOptions(gridObj, os_data);
             if ($customWebData.module.hasModule('gridTooltip')) $customWebData.module.getModule('gridTooltip').setOptions(gridObj, os_data);
         };
@@ -500,13 +505,13 @@
             return;
         }
 
-        var importParam = {
+        const importParam = {
             MODE: 'selectOne',
             SCOPE: scope,
             WEB_DATA_ID: web_data_id
         };
         $nst.is_data_os_data('ZUNIECM_WEB_DATA', importParam, function (os_data) {
-            var data = $u.webData.getSingleSafeData(os_data['DATA']);
+            const data = $u.webData.getSingleSafeData(os_data['DATA']);
             callback(data);
             if (scope === 'gridSetting') {
                 if ($customWebData.module.hasModule('gridSorting'))

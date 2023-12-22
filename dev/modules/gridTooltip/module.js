@@ -21,7 +21,7 @@
         },
         method: {
             setOptions: function (gridObj, os_data) {
-                var columns =
+                const columns =
                     os_data['TOOLTIP_COLUMNS'] === 'ALL' ? $customWebData.tools.getVisibleGridColumnKeys(gridObj).join() : os_data['TOOLTIP_COLUMNS'] || '';
                 $customWebData.tools.trimSplit(columns).map(function (column) {
                     if (gridObj.getGridHeader(column)) gridObj.useColumnTooltip(column, true);

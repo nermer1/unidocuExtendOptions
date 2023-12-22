@@ -40,14 +40,14 @@
                     color: ''
                 },
                 setOptions: function (gridObj, os_data) {
-                    var color = os_data['SET_ROW_COLOR_SELECT'] ? os_data['SET_ROW_COLOR_SELECT']['background'] : defalutColor['background'];
+                    const color = os_data['SET_ROW_COLOR_SELECT'] ? os_data['SET_ROW_COLOR_SELECT']['background'] : defalutColor['background'];
                     info.method.option.isUsed = os_data['SET_ROW_COLOR'] === '1';
                     info.method.option.color = $customWebData.tools.hexColorToRgbColor(color);
                 },
                 getUsed: function (gridObj) {
-                    var readOnly = true,
+                    let readOnly = true,
                         headers = $customWebData.tools.getVisibleGridColumnKeys(gridObj);
-                    for (var i in headers) {
+                    for (let i in headers) {
                         if (headers[i]['key'] === 'SELECTED' || headers[i]['key'] === 'CRUD') continue;
                         if (headers[i]['edit'] === true) {
                             readOnly = false;

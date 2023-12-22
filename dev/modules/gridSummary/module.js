@@ -3,7 +3,7 @@
  *
  */
 (function () {
-    var info = {
+    const info = {
         version: '1.0.0',
         category: 'gridSetting',
         moduleName: 'gridSummary',
@@ -27,12 +27,12 @@
         },
         method: {
             setOptions: function (gridObj, os_data) {
-                var isSummary = os_data['USE_SUMMARY'] === '1',
+                const isSummary = os_data['USE_SUMMARY'] === '1',
                     footer = os_data['SUMMARY_LOCATION'] === '1' ? 'footer' : '';
                 gridObj.setSummaryVisible(isSummary, footer);
             },
             changeHandler: function (used) {
-                var formId = 'SUMMARY_LOCATION';
+                const formId = 'SUMMARY_LOCATION';
                 if (!$u.get(formId)) return;
                 if (used === '1') $u.get(formId).setReadOnly(false);
                 else $u.get(formId).setReadOnly(true);

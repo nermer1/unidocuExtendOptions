@@ -1,3 +1,11 @@
+## 2023-12-22, version 1.0.0
+- jar 종속성 추가하여 사용하도록 변경
+- pom.xml 추가, 유니포스트 nexus에 등록
+- maven 프로젝트 등록
+- prettierignore 제외 추가
+- eslint 설정 추가
+- npm run compile 명령어 변경
+
 ## 2023-09-19, version 1.0.0
 
 -   파일명 변경 extendCustomWebData.js -> main.js

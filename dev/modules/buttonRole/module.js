@@ -30,7 +30,7 @@
         method: {
             isShowRoleButton: function (os_data) {
                 if (!os_data['BUTTON_ROLE']) return true;
-                var isUserRole = $customWebData.tools.hasRole(os_data['BUTTON_ROLE'], [staticProperties.user['ROLE'], staticProperties.user['PERNR']].join());
+                const isUserRole = $customWebData.tools.hasRole(os_data['BUTTON_ROLE'], [staticProperties.user['ROLE'], staticProperties.user['PERNR']].join());
                 if (!!os_data['VISIBLE'] && !!os_data['BUTTON_ROLE']) {
                     if (!isUserRole) os_data['VISIBLE'] = '';
                     return true;

@@ -3,7 +3,7 @@
  *
  */
 (function () {
-    var info = {
+    const info = {
         version: '1.0.0',
         category: 'gridSetting',
         moduleName: 'gridSelectedOptions',
@@ -33,7 +33,7 @@
                 isForce: false
             },
             setOptions: function (gridObj, os_data) {
-                var option = os_data['SELECTED_OPTIONS'] || '',
+                const option = os_data['SELECTED_OPTIONS'] || '',
                     isHide = !!option.match('A'),
                     isRadio = !!option.match('B'),
                     isCheckAll = !!option.match('C'),

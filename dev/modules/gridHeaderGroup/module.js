@@ -22,7 +22,7 @@
         },
         method: {
             setOptions: function (gridObj, os_data) {
-                var groupInfo = os_data['GROUPING'] || '';
+                const groupInfo = os_data['GROUPING'] || '';
                 if (!groupInfo) return;
                 else if (Array.isArray(groupInfo) && groupInfo.length === 0) return;
                 else if (typeof groupInfo === 'object' && Object.keys(groupInfo).length === 0) return;

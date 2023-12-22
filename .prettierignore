@@ -1,2 +1,5 @@
-/node_modules
-customize.css
+./node_modules
+*.json
+*.xml
+*.md
+.*
