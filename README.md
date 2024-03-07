@@ -12,7 +12,7 @@
 <dependency>
     <groupId>com.unipost.unidocu-plugins</groupId>
     <artifactId>unidocuOptionExpansion</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
 </dependency>
 ```
 
