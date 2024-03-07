@@ -1,7 +1,7 @@
 {
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "compile": "babel ./dev --out-dir ./src/main/resources/META-INF/resources/webjars/vendorCustom/plugins/unidocuOptionExpansion && prettier --write --ignore-path .prettierignore ./"
+        "compile": "babel ./src --out-dir ./out/src/main/resources/META-INF/resources/webjars/vendorCustom/plugins/unidocuOptionExpansion && prettier --write --ignore-path .prettierignore ./"
     },
     "devDependencies": {
         "@babel/cli": "^7.22.9",

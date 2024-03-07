@@ -9,5 +9,6 @@
             }
         ]
     ],
+    "exclude": "src/**/$uPlugins.js",
     "plugins": []
 }

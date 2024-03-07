@@ -1,3 +1,11 @@
+## 2024-03-07, version 1.0.1
+- document.append => appendChild로 변경
+- 개발 소스 폴더명 변경 dev -> src
+- node 빌드 babel 대상 폴더 변경 dev -> src
+- babel output 폴더 변경 src -> out
+- maven resource 대상 폴더 변경 src -> out
+- 위 상황에 따라 gitignore 수정
+
 ## 2023-12-22, version 1.0.0
 - jar 종속성 추가하여 사용하도록 변경
 - pom.xml 추가, 유니포스트 nexus에 등록
