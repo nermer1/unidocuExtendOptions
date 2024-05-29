@@ -6,7 +6,7 @@
 
 ### 사용 방법
 
-1. 프로젝트 pom.xml에 종속성 추가
+1. 프로젝트 일반 pom.xml에 종속성 추가
 
 ```xml
 <dependency>
@@ -20,7 +20,7 @@
 
 ```javascript
 /*customize.js 모듈 호출*/
-define(['vendorCustom/plugins/$uPlugins'], function () {
+define([module1, module2..., 'vendorCustom/plugins/$uPlugins'], function () {
     // ...원래 로직 가장 아래 함수 실행
     $u.plugins.init();
 });
@@ -45,14 +45,14 @@ unidocu-button.css
 
 
 ```css
-/*라인 제거*/
+/*아래 라인 제거*/
 #unipost-unidocu .unidocu-button.hidden {display: none;}
 ```
 
 unidocuButton.js
 
 ```javascript
-/*isShowRoleButton 제거*/
+/*isShowRoleButton 메서드 제거*/
 function isShowRoleButton(os_data) {
     var bool = false, trimSplit = function(a, b) {
         var p = {};
@@ -70,6 +70,7 @@ function isShowRoleButton(os_data) {
     return bool;
 }
 
+/*라인 제거*/
 $u.buttons.getSingleButtonsEl = function(os_data) {
     //... 생략
     // 2라인 제거
