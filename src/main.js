@@ -537,6 +537,10 @@
     const _renderGridSingle = $u.renderGridSingle;
     $u.renderGridSingle = function (gridObj, subGroup) {
         _renderGridSingle(gridObj, subGroup);
-        $customWebData.module.setOptions(gridObj, $u.webData.gridSetting.getData($u.webData.getWEB_DATA_ID([subGroup, $(gridObj).data('subId')]))['OS_DATA']);
+        var $gridObj = $(gridObj);
+        $customWebData.module.setOptions(
+            gridObj,
+            $u.webData.gridSetting.getData($u.webData.getWEB_DATA_ID([$gridObj.data('subGroup'), $gridObj.data('subId')]))['OS_DATA']
+        );
     };
 })();

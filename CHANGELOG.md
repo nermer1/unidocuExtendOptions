@@ -1,3 +1,6 @@
+## 2024-07-05, version 1.0.2
+- 다이얼창 그리드 설정 적용되지 않는 현상 수정
+
 ## 2024-03-07, version 1.0.1
 - document.append => appendChild로 변경
 - 개발 소스 폴더명 변경 dev -> src
