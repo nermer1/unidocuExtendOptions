@@ -20,12 +20,12 @@
         <repository>
             <uniqueVersion>false</uniqueVersion>
             <id>unidocu-web-release-repository</id>
-            <url>http://unidocu.unipost.co.kr/nexus/content/repositories/releases</url>
+            <url>https://unidocu.unipost.co.kr/nexus/content/repositories/releases</url>
         </repository>
         <snapshotRepository>
             <uniqueVersion>true</uniqueVersion>
             <id>unidocu-web-snapshot-repository</id>
-            <url>http://unidocu.unipost.co.kr/nexus/content/repositories/snapshots</url>
+            <url>https://unidocu.unipost.co.kr/nexus/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
 
