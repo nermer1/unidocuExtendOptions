@@ -27,7 +27,7 @@
                                     key: 'background',
                                     defalutValue: defalutColor['background'],
                                     element:
-                                        "<div style='display: inline-flex; align-items: center; margin-right: 10px;'><span style='margin-right: 5px;'>배경:</span><input type='color'></div>"
+                                        "<div style='display: inline-flex; align-items: center; margin-right: 10px;'><input type='color'><span style='margin-right: 5px;'>:배경</span></div>"
                                 }
                             ]
                         }
@@ -48,8 +48,9 @@
                     let readOnly = true,
                         headers = $customWebData.tools.getVisibleGridColumnKeys(gridObj);
                     for (let i in headers) {
-                        if (headers[i]['key'] === 'SELECTED' || headers[i]['key'] === 'CRUD') continue;
-                        if (headers[i]['edit'] === true) {
+                        const header = gridObj.getGridHeader(headers[i]);
+                        if (header['key'] === 'SELECTED' || header['key'] === 'CRUD') continue;
+                        if (header['edit'] === true) {
                             readOnly = false;
                             break;
                         }

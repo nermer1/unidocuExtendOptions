@@ -13,8 +13,7 @@
                     {
                         COLUMN_ID: 'TOOLTIP_COLUMNS',
                         TEXT: '툴팁적용컬럼',
-                        COLUMN_TYPE: 'Uni_InputText',
-                        COL_SPAN: '2'
+                        COLUMN_TYPE: 'Uni_InputText'
                     }
                 ]
             }

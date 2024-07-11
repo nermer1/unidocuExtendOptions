@@ -14,8 +14,7 @@
                         COLUMN_ID: 'GROUPING',
                         TEXT: '헤더그룹핑',
                         COLUMN_TYPE: 'Uni_Empty',
-                        SUB_COLUMN_TYPE: 'jsonEditor',
-                        COL_SPAN: '2'
+                        SUB_COLUMN_TYPE: 'jsonEditor'
                     }
                 ]
             }

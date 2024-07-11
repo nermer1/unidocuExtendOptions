@@ -17,8 +17,8 @@
                         OPTIONS: [{text: '', value: '1'}]
                     },
                     {
-                        COLUMN_ID: 'SUMMARY_LOCATION',
-                        TEXT: '하단적용여부',
+                        COLUMN_ID: 'USE_SUMMARY_A',
+                        TEXT: '옵션',
                         COLUMN_TYPE: 'Uni_CheckBox',
                         OPTIONS: [{text: 'footer', value: '1'}]
                     }
@@ -28,11 +28,11 @@
         method: {
             setOptions: function (gridObj, os_data) {
                 const isSummary = os_data['USE_SUMMARY'] === '1',
-                    footer = os_data['SUMMARY_LOCATION'] === '1' ? 'footer' : '';
+                    footer = os_data['USE_SUMMARY_A'] === '1' ? 'footer' : '';
                 gridObj.setSummaryVisible(isSummary, footer);
             },
             changeHandler: function (used) {
-                const formId = 'SUMMARY_LOCATION';
+                const formId = 'USE_SUMMARY_A';
                 if (!$u.get(formId)) return;
                 if (used === '1') $u.get(formId).setReadOnly(false);
                 else $u.get(formId).setReadOnly(true);

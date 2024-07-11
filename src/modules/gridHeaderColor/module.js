@@ -31,25 +31,25 @@
                                     key: 'background',
                                     defalutValue: defalutColor['background'],
                                     element:
-                                        "<div style='display: inline-flex; align-items: center; margin-right: 10px;'><span style='margin-right: 5px;'>배경:</span><input type='color'></div>"
+                                        "<div style='display: inline-flex; align-items: center; margin-right: 10px;'><input type='color'><span style='margin-right: 5px;'>:배경</span></div>"
                                 },
                                 {
                                     key: 'font',
                                     defalutValue: defalutColor['font'],
                                     element:
-                                        "<div style='display: inline-flex; align-items: center; margin-right: 10px;'><span style='margin-right: 5px;'>글자:</span><input type='color'></div>"
+                                        "<div style='display: inline-flex; align-items: center; margin-right: 10px;'><input type='color'><span style='margin-right: 5px;'>:글자</span></div>"
                                 },
                                 {
                                     key: 'hover',
                                     defalutValue: defalutColor['hover'],
                                     element:
-                                        "<div style='display: inline-flex; align-items: center; margin-right: 10px;'><span style='margin-right: 5px;'>오버:</span><input type='color'></div>"
+                                        "<div style='display: inline-flex; align-items: center; margin-right: 10px;'><input type='color'><span style='margin-right: 5px;'>:오버</span></div>"
                                 },
                                 {
                                     key: 'selectedBackground',
                                     defalutValue: defalutColor['selectedBackground'],
                                     element:
-                                        "<div style='display: inline-flex; align-items: center; margin-right: 10px;'><span style='margin-right: 5px;'>선택배경:</span><input type='color'></div>"
+                                        "<div style='display: inline-flex; align-items: center; margin-right: 10px;'><input type='color'><span style='margin-right: 5px;'>:선택배경</span></div>"
                                 }
                             ]
                         }

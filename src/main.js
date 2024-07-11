@@ -39,7 +39,7 @@
  *     description: 그리드 합계 표시
  *     params: {
  *         USE_SUMMARY: 체크 시 합계 표시
- *         SUMMARY_LOCATION: 합계 상단, 하단 표시 여부
+ *         USE_SUMMARY_A: 합계 상단, 하단 표시 여부
  *     }
  * }
  * gridTooltip = {
@@ -129,12 +129,32 @@
     };
 
     $customWebData.extendWebData = (webData) => {
-        Object.keys(webData).map(function (key) {
+        Object.keys(webData).forEach((key) => {
             if (!$u.webData.customWebDataMap[key]) throw '존재하지 않는 웹데이터 아이디';
-            if (Object.prototype.hasOwnProperty.call(webData[key], 'OT_DATA'))
-                webData[key]['OT_DATA'].map((data) => $u.webData.customWebDataMap[key]['OT_DATA'].push(data));
-            if (Object.prototype.hasOwnProperty.call(webData[key], 'OS_DATA'))
-                $customWebData.module.extend($u.webData.customWebDataMap[key]['OS_DATA'], webData[key]['OS_DATA']);
+            const os_data = $u.webData.customWebDataMap[key]['OS_DATA'];
+            if (Object.prototype.hasOwnProperty.call(webData[key], 'OS_DATA')) {
+                $customWebData.module.extend(os_data, webData[key]['OS_DATA']);
+            }
+            if (Object.prototype.hasOwnProperty.call(webData[key], 'OT_DATA')) {
+                const ot_data = $u.webData.customWebDataMap[key]['OT_DATA'];
+                const colLen = Number(os_data['COL_LEN']);
+                const isLenOdd = $customWebData.tools.checkOdd(ot_data.length);
+                // grid 확장 옵션은 짝수 기반으로 설계됨 기존 COL_LEN 값이 홀수 인 경우엔 의도하지 않게 위치가 변경
+                // 기존 COL_LEN 이 홀수, ot_data 길이가 COL_LEN 만큼 채워지지 않는 경우 기존의 ot_data 마지막 요소 COL_SPAN 최대로
+                if (isLenOdd && ot_data.length > 0 && ot_data.length < colLen) {
+                    ot_data[ot_data.length - 1]['COL_SPAN'] = colLen - ot_data.length + 1;
+                }
+                webData[key]['OT_DATA'].forEach((data, index) => {
+                    const len = webData[key]['OT_DATA'].length;
+                    if (len === 1) data['COL_SPAN'] = colLen.toString();
+                    if (isLenOdd) {
+                        if (len > 1) {
+                            data['COL_SPAN'] = index === 0 ? Math.floor(colLen / 2) : Math.ceil(colLen / 2);
+                        }
+                    }
+                    ot_data.push(data);
+                });
+            }
         });
     };
 
@@ -142,6 +162,9 @@
      * 여러가지 util
      */
     $customWebData.tools = {
+        checkOdd: (value) => {
+            return Number(value) % 2 === 1;
+        },
         scriptLoader: (src) => {
             const script = document.createElement('script');
             script.type = 'text/javascript';
@@ -185,7 +208,7 @@
          * @return {boolean} 권현 존재 여부 반환
          */
         hasRole: (s, t) => {
-            return $customWebData.tools.trimSplit(s).reduce(function (a, b) {
+            return $customWebData.tools.trimSplit(s).reduce((a, b) => {
                 if (new RegExp('(\\s|\\,|^)' + b + '(\\s|\\,|$)', 'i').test(t)) a = true;
                 return a;
             }, false);
@@ -403,89 +426,54 @@
      * @param gridObj 그리드 객체
      */
     function customizeBindExtendAPI(gridObj) {
+        const originalMethod = {
+            _onChangeCell: gridObj._onChangeCell,
+            setCheckBarAsRadio: gridObj.setCheckBarAsRadio,
+            setHeaderCheckBox: gridObj.setHeaderCheckBox,
+            setColumnHide: gridObj.setColumnHide,
+            setSortEnable: gridObj.setSortEnable,
+            setGroupHeader: gridObj.setGroupHeader
+        };
+        gridObj._onChangeCell = function (columnKey, rowIndex, oldValue, newValue) {
+            originalMethod['_onChangeCell'].call(this, columnKey, rowIndex, oldValue, newValue);
+            if (columnKey === 'SELECTED' && $customWebData.module.hasModule('gridRowColor')) {
+                $customWebData.module.getModule('gridRowColor').changeBgColorHandler(gridObj, rowIndex);
+            }
+        };
         gridObj.setCheckBarAsRadio = function (columnKey, useAsRadio) {
             if ($customWebData.module.hasModule('gridSelectedOptions')) {
                 const module = $customWebData.module.getModule('gridSelectedOptions');
                 if (module.option.isForce) useAsRadio = module.option.isRadio;
             }
-            gridObj._rg.setCheckBar({
-                exclusive: useAsRadio === null || useAsRadio === undefined ? true : useAsRadio
-            });
+            originalMethod['setCheckBarAsRadio'].call(this, columnKey, useAsRadio);
         };
         gridObj.setHeaderCheckBox = function (columnKey, useHeaderCheckbox) {
             if ($customWebData.module.hasModule('gridSelectedOptions')) {
                 const module = $customWebData.module.getModule('gridSelectedOptions');
                 if (module.option.isForce) useHeaderCheckbox = module.option.isCheckAll;
             }
-            gridObj._rg.setCheckBar({showAll: useHeaderCheckbox});
+            originalMethod['setHeaderCheckBox'].call(this, columnKey, useHeaderCheckbox);
         };
         gridObj.setColumnHide = function (columnKey, isHide) {
             if ($customWebData.module.hasModule('gridSelectedOptions')) {
                 const module = $customWebData.module.getModule('gridSelectedOptions');
                 if (module.option.isForce) isHide = module.option.isHide;
             }
-            const visible = isHide === false;
-            if (columnKey === 'SELECTED') gridObj._rg.setCheckBar({visible: visible});
-            else gridObj._rg.setColumnProperty(columnKey, 'visible', visible);
-
-            if (gridObj.getGridHeader(columnKey) && gridObj.getGridHeader(columnKey)['serverType'] === 'popup') {
-                gridObj._rg.setColumnProperty(columnKey + '_', 'visible', visible);
-                gridObj._rg.setColumnProperty(columnKey + '_TXT', 'visible', visible);
-            }
+            originalMethod['setColumnHide'].call(this, columnKey, isHide);
         };
         gridObj.setSortEnable = function (enable) {
             if ($customWebData.module.hasModule('gridSorting')) {
                 const module = $customWebData.module.getModule('gridSorting');
                 if (module.option.isForce) enable = module.option.isSort;
             }
-            gridObj._rg.setSortingOptions({enabled: enable});
+            originalMethod['setSortEnable'].call(this, enable);
         };
         gridObj._onRowActivate = function (rowIndex) {
             gridObj['__onRowActivate'].apply(this, arguments);
             if ($customWebData.module.hasModule('gridRowColor')) $customWebData.module.getModule('gridRowColor').changeBgColorHandler(gridObj, rowIndex);
         };
         gridObj.setGroupHeader = function (groupInfo) {
-            gridObj.groupInfo = $.extend(true, [], groupInfo);
-            gridObj.columnsKeyGroupIndexMap = {};
-            $.each(gridObj.groupInfo, function (index, item) {
-                $.each(item['childColumns'], function (index2, item2) {
-                    let gridHeader = gridObj.getGridHeader(item2);
-                    if (!gridHeader) throw item2 + ' grid header undefined.';
-                    if (!item.subColumns) item.subColumns = [];
-                    item.subColumns.push($.extend(true, {}, gridHeader));
-                    gridObj.columnsKeyGroupIndexMap[gridHeader.key] = index;
-                });
-            });
-            let headers = gridObj.rg._gridHeadersToRealGridHeaders(gridObj.getGridHeaders(), gridObj.getRealGridUserDateFormat());
-            let groupHeaderTemplate = {
-                type: 'group',
-                orientation: 'horizontal',
-                width: 0,
-                columns: []
-            };
-            let groupHeaders = [];
-            gridObj.groupIndexGroupHeaderMap = {};
-            $.each(headers, function (index, item) {
-                let groupIndex = gridObj.columnsKeyGroupIndexMap[item.fieldName];
-                if (groupIndex === undefined) {
-                    groupHeaders.push(item);
-                    return true;
-                }
-                if (!gridObj.groupIndexGroupHeaderMap[groupIndex]) {
-                    let groupHeader = $.extend(true, {name: groupInfo[groupIndex]['groupText']}, groupHeaderTemplate);
-                    gridObj.groupIndexGroupHeaderMap[groupIndex] = groupHeader;
-                    groupHeaders.push(groupHeader);
-                }
-                gridObj.groupIndexGroupHeaderMap[groupIndex].columns.push(item);
-                gridObj.groupIndexGroupHeaderMap[groupIndex].width += Number(item.width);
-            });
-            gridObj._rg.setColumns(groupHeaders);
-            $.each(gridObj.getGridHeaders(), function (index, header) {
-                if ($.type(header['combos']) === 'array') gridObj.setComboOptions(header.key, header['combos']);
-            });
-            gridObj.rg._applyGridFormat();
-            gridObj.setGridNumberPrecision($u.unidocuCurrency.getSystemPrecision());
-
+            originalMethod['setGroupHeader'].call(this, groupInfo);
             const os_data = $u.webData.gridSetting.getData($u.webData.getWEB_DATA_ID([$u.page.getPROGRAM_ID(), $(gridObj).data('subId')]))['OS_DATA'];
             if ($customWebData.module.hasModule('gridHeaderColor')) $customWebData.module.getModule('gridHeaderColor').setOptions(gridObj, os_data);
             if ($customWebData.module.hasModule('gridTooltip')) $customWebData.module.getModule('gridTooltip').setOptions(gridObj, os_data);
