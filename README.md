@@ -137,11 +137,11 @@ maven plugin 사용으로 빌드 및 배포
 
 ---
 
-### 기능 설명
+## 기능 설명
+![image](https://github.com/user-attachments/assets/39df2e47-c2f3-44a5-8541-6bb2692364b8)
 
-![image](https://github.com/nermer1/unidocuExtendOptions/assets/51549944/15c463f3-ef7b-4ceb-a781-56f2ac8c4847)
 
-##정렬(모듈명: gridSorting)
+### 정렬(모듈명: gridSorting)
 
 ```text
 {
@@ -156,11 +156,12 @@ maven plugin 사용으로 빌드 및 배포
 }
 ```
 
-##합계(모듈명: gridSummary)
+### 합계(모듈명: gridSummary)
 
 옵션 적용 예시
 
-![image](https://github.com/nermer1/unidocuExtendOptions/assets/51549944/f8733225-af61-442d-9532-ce0f87898cfd)
+![image](https://github.com/user-attachments/assets/06ab5678-839d-4f85-87b5-16653ff358dd)
+
 
 ```text
 {
@@ -174,7 +175,7 @@ maven plugin 사용으로 빌드 및 배포
 }
 ```
 
-##툴팁(모듈명: gridTooltip)
+### 툴팁(모듈명: gridTooltip)
 
 옵션 적용 예시
 
@@ -200,11 +201,12 @@ maven plugin 사용으로 빌드 및 배포
 }
 ```
 
-##컬럼색상(모듈명: gridHeaderColor)
+### 컬럼색상(모듈명: gridHeaderColor)
 
 옵션 적용 예시
 
-![image](https://github.com/nermer1/unidocuExtendOptions/assets/51549944/bacbcf39-9284-485a-9ae0-cacf24b77eea)
+![image](https://github.com/user-attachments/assets/8f63610a-ca9f-4301-8418-4cb218b38862)
+
 
 ```text
 {
@@ -221,7 +223,7 @@ maven plugin 사용으로 빌드 및 배포
 }
 ```
 
-##행색상(모듈명: gridRowColor)
+### 행색상(모듈명: gridRowColor)
 
 옵션 적용 예시
 
@@ -239,11 +241,12 @@ maven plugin 사용으로 빌드 및 배포
 }
 ```
 
-##체크바(모듈명: gridSelectedOptions)
+### 체크바(모듈명: gridSelectedOptions)
 
 옵션 적용 예시
 
-![image](https://github.com/nermer1/unidocuExtendOptions/assets/51549944/e853080d-ff58-414b-bc2b-6cd4ea7bf1c9)
+![image](https://github.com/user-attachments/assets/ee8f0fc2-c8fe-48ef-86b4-6892c7c9f975)
+
 
 ```text
 {
@@ -257,11 +260,9 @@ maven plugin 사용으로 빌드 및 배포
 }
 ```
 
-##버튼권한(모듈명: buttonRole)
+### 버튼권한(모듈명: buttonRole)
 
 옵션 적용 예시
-
-![image](https://github.com/nermer1/unidocuExtendOptions/assets/51549944/e853080d-ff58-414b-bc2b-6cd4ea7bf1c9)
 
 ```text
 {
