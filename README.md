@@ -146,11 +146,11 @@ maven plugin 사용으로 빌드 및 배포
 ```text
 {
     "name": {
-        "unused": "정렬 사용 여부",
-        "force": "강제 적용 옵션(기존에 설정된 정렬 로직 무시하고 현재 설정 강제 적용)",
+        "unused": "정렬 사용 여부"
     },
     "options": {
         "explicit": "정렬 사용일 때, 칸이 입력될 때마다 자동 정렬 여부",
+        "force": "강제 적용 옵션(기존에 설정된 정렬 로직 무시하고 현재 설정 강제 적용)"
     },
     "category": "gridSetting"
 }
@@ -254,6 +254,9 @@ maven plugin 사용으로 빌드 및 배포
         "hide": "체크바 숨김 여부",
         "radio": "라디오 버튼 적용",
         "checkAll": "전체 체크 활성화",
+        "none": "설정된 기본값"
+    },
+    "options": {
         "force": "강제 적용 옵션(기존에 설정된 정렬 로직 무시하고 현재 설정 강제 적용)"
     },
     "category": "gridSetting"
