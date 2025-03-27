@@ -197,6 +197,9 @@ maven plugin 사용으로 빌드 및 배포
     "name": {
         "json": "컬럼 그룹핑 적용(옵션 적용 예시 = {groupText: '그룹명', childColumns: [컬럼명...]})"
     },
+     "options": {
+        "헤더높이": "전체 헤더 높이 변경, 그룹핑 시 글자 잘리는 경우에 사용(헤더 높이 일괄로 지정됨)"
+     },
     "category": "gridSetting"
 }
 ```

@@ -15,6 +15,11 @@
                         TEXT: '헤더그룹핑',
                         COLUMN_TYPE: 'Uni_Empty',
                         SUB_COLUMN_TYPE: 'jsonEditor'
+                    },
+                    {
+                        COLUMN_ID: 'HEADER_HEIGHT',
+                        TEXT: '헤더높이',
+                        COLUMN_TYPE: 'Uni_InputText'
                     }
                 ]
             }
@@ -22,6 +27,8 @@
         method: {
             setOptions: function (gridObj, os_data) {
                 const groupInfo = os_data['GROUPING'] || '';
+                const height = os_data['HEADER_HEIGHT'] || '';
+                if (height) gridObj._rg.gridView.setHeader({height: height});
                 if (!groupInfo) return;
                 else if (Array.isArray(groupInfo) && groupInfo.length === 0) return;
                 else if (typeof groupInfo === 'object' && Object.keys(groupInfo).length === 0) return;

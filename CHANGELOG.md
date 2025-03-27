@@ -9,6 +9,9 @@
 * [system] 프로젝트 설정 변경 
 ---
 
+## 2025-03-27, version 1.0.4
+- [modify] gridHeaderGroup 텍스트 한줄 이상인 경우 잘리는 문제로, 헤더 높이 설정 추가(그루핑, 일반 일괄 지정됨을 참고)
+
 ## 2024-07-11, version 1.0.3
 - [modify] gridRowColor 편집 가능한 헤더가 존재할 때도 기능 적용되는 현상 수정
 - [modify] gridRowColor selected 클릭할 때도 적용할 수 있도록 추가
