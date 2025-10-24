@@ -105,7 +105,17 @@
         name: 'unidocuOptionExpansion',
         description: 'unidocu5 plugin, f8 option extension',
         basePath: '/unidocuOptionExpansion/modules/',
-        extraModules: ['gridSorting', 'gridSummary', 'gridTooltip', 'gridHeaderGroup', 'gridHeaderColor', 'gridRowColor', 'gridSelectedOptions', 'buttonRole']
+        extraModules: [
+            'gridSorting',
+            'gridSummary',
+            'gridTooltip',
+            'gridHeaderGroup',
+            'gridHeaderColor',
+            'gridRowColor',
+            'gridSelectedOptions',
+            'buttonRole',
+            'pilot'
+        ]
     };
     window.$customWebData = {};
     $customWebData.getConfig = () => config;
@@ -342,9 +352,12 @@
             let $self = this.getEl(column),
                 $input;
 
+            const {defaultValue = {}} = $self.params;
+
             $self.init = function () {
                 $self.$el.append('<div class="input-box"><input type="text" readonly/></div>');
                 $input = $self.$el.find('input');
+                if (!$customWebData.tools.isEmptyObject(defaultValue)) $self.setValue(defaultValue);
                 $input.click(function () {
                     $u.dialog.JSONInputDialog.open(function (data) {
                         $self.setValue(data);
@@ -353,7 +366,7 @@
             };
 
             $self.getValue = function () {
-                return $input.val() ? JSON.parse($input.val()) : {};
+                return $input.val() ? JSON.parse($input.val()) : '';
             };
 
             $self.setValue = function (value) {
@@ -432,7 +445,8 @@
             setHeaderCheckBox: gridObj.setHeaderCheckBox,
             setColumnHide: gridObj.setColumnHide,
             setSortEnable: gridObj.setSortEnable,
-            setGroupHeader: gridObj.setGroupHeader
+            setGroupHeader: gridObj.setGroupHeader,
+            setJSONData: gridObj.setJSONData
         };
         gridObj._onChangeCell = function (columnKey, rowIndex, oldValue, newValue) {
             originalMethod['_onChangeCell'].call(this, columnKey, rowIndex, oldValue, newValue);
@@ -477,6 +491,13 @@
             const os_data = $u.webData.gridSetting.getData($u.webData.getWEB_DATA_ID([$u.page.getPROGRAM_ID(), $(gridObj).data('subId')]))['OS_DATA'];
             if ($customWebData.module.hasModule('gridHeaderColor')) $customWebData.module.getModule('gridHeaderColor').setOptions(gridObj, os_data);
             if ($customWebData.module.hasModule('gridTooltip')) $customWebData.module.getModule('gridTooltip').setOptions(gridObj, os_data);
+        };
+        gridObj.setJSONData = function (jsonArray) {
+            originalMethod['setJSONData'].call(this, jsonArray);
+            if ($customWebData.module.hasModule('pilot')) {
+                const module = $customWebData.module.getModule('pilot');
+                module.gridPagination(gridObj, jsonArray);
+            }
         };
     }
 

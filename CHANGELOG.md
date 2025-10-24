@@ -8,6 +8,8 @@
 * [warning] 사용 중인 프로젝트에 영향을 끼침
 * [system] 프로젝트 설정 변경 
 ---
+## 2025-10-24, version 1.0.5
+- [add] gridPaging 옵션 추가
 
 ## 2025-03-27, version 1.0.4
 - [modify] gridHeaderGroup 텍스트 한줄 이상인 경우 잘리는 문제로, 헤더 높이 설정 추가(그루핑, 일반 일괄 지정됨을 참고)

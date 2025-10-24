@@ -266,6 +266,25 @@ maven plugin 사용으로 빌드 및 배포
 }
 ```
 
+### 체크바(모듈명: gridSelectedOptions)
+
+옵션 적용 예시
+
+
+
+```text
+{
+    "name": {
+        "used": "페이징 사용 여부"
+    },
+    "options": {
+        "pageSize": "",
+        "pageSizes": []
+    },
+    "category": "gridSetting"
+}
+```
+
 ### 버튼권한(모듈명: buttonRole)
 
 옵션 적용 예시
