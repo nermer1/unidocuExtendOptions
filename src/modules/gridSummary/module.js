@@ -30,7 +30,8 @@ export const info = {
                 footer = os_data['USE_SUMMARY_A'] === '1' ? 'footer' : '';
             gridObj.setSummaryVisible(isSummary, footer);
         },
-        changeHandler: function (used) {
+        changeHandler: function (os_data = {}) {
+            const {USE_SUMMARY: used} = os_data;
             const formId = 'USE_SUMMARY_A';
             if (!$u.get(formId)) return;
             if (used === '1') $u.get(formId).setReadOnly(false);
@@ -38,7 +39,7 @@ export const info = {
         },
         addEvent: function () {
             $efi.createStatement.bindEvent.bindChange('USE_SUMMARY', function () {
-                info['method'].changeHandler($u.get('USE_SUMMARY').getValue());
+                info['method'].changeHandler({USE_SUMMARY: $u.get('USE_SUMMARY').getValue()});
             });
         }
     },

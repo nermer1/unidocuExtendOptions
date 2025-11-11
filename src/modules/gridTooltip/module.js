@@ -19,9 +19,8 @@ export const info = {
     },
     method: {
         setOptions: function (gridObj, os_data) {
-            const columns =
-                os_data['TOOLTIP_COLUMNS'] === 'ALL' ? $customWebData.tools.getVisibleGridColumnKeys(gridObj).join() : os_data['TOOLTIP_COLUMNS'] || '';
-            $customWebData.tools.trimSplit(columns).map(function (column) {
+            const columns = os_data['TOOLTIP_COLUMNS'] === 'ALL' ? $u.plugins.tools.getVisibleGridColumnKeys(gridObj).join() : os_data['TOOLTIP_COLUMNS'] || '';
+            $u.plugins.tools.trimSplit(columns).map(function (column) {
                 if (gridObj.getGridHeader(column)) gridObj.useColumnTooltip(column, true);
             });
         }

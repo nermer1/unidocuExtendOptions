@@ -5,7 +5,7 @@
 export const info = {
     version: '1.0.0',
     category: 'gridSetting',
-    moduleName: 'pilot',
+    moduleName: 'gridPaging',
     webData: {
         'gridSetting@form-data': {
             OT_DATA: [

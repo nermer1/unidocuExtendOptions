@@ -34,18 +34,14 @@ const defalutColor = {background: '#ffffff'},
             }
         },
         method: {
-            option: {
-                isUsed: false,
-                color: ''
-            },
             setOptions: function (gridObj, os_data) {
                 const color = os_data['SET_ROW_COLOR_SELECT'] ? os_data['SET_ROW_COLOR_SELECT']['background'] : defalutColor['background'];
-                info.method.option.isUsed = os_data['SET_ROW_COLOR'] === '1';
-                info.method.option.color = $customWebData.tools.hexColorToRgbColor(color);
+                gridObj.__plugin__gridRowColor_isUsed = os_data['SET_ROW_COLOR'] === '1';
+                gridObj.__plugin__gridRowColor_color = $u.plugins.tools.hexColorToRgbColor(color);
             },
             getUsed: function (gridObj) {
                 let readOnly = true,
-                    headers = $customWebData.tools.getVisibleGridColumnKeys(gridObj);
+                    headers = $u.plugins.tools.getVisibleGridColumnKeys(gridObj);
                 for (let i in headers) {
                     const header = gridObj.getGridHeader(headers[i]);
                     if (header['key'] === 'SELECTED' || header['key'] === 'CRUD') continue;
@@ -68,7 +64,7 @@ const defalutColor = {background: '#ffffff'},
                         );
                     });
                 }
-                gridObj.preSelectedIndex = $customWebData.tools.originalRowIndex(gridObj, rowIndex);
+                gridObj.preSelectedIndex = $u.plugins.tools.originalRowIndex(gridObj, rowIndex);
                 gridObj.preCellColorMap = info.method.getSaveColors(gridObj, gridObj.preSelectedIndex);
                 gridObj.setRowBgColor(gridObj.preSelectedIndex, info.method.option.color);
             },

@@ -43,8 +43,8 @@ export const info = {
             gridObj._rg.setSortingOptions({enabled: isSort});
             if (isSort && isExplicit) gridObj._rg.gridView.setOptions({sortMode: 'explicit'});
         },
-        changeHandler: function (used) {
-            used = used || '';
+        changeHandler: function (os_data = {}) {
+            const {SORTING_NOT_USED: used = ''} = os_data;
             var formId = 'SORTING_NOT_USED_A';
             if (!$u.get(formId)) return;
             if (used.match('A')) {
@@ -56,7 +56,7 @@ export const info = {
         },
         addEvent: function () {
             $efi.createStatement.bindEvent.bindChange('SORTING_NOT_USED', function () {
-                info['method'].changeHandler($u.get('SORTING_NOT_USED').getValue());
+                info['method'].changeHandler({SORTING_NOT_USED: $u.get('SORTING_NOT_USED').getValue()});
             });
         }
     },

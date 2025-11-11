@@ -29,7 +29,7 @@ export const info = {
     method: {
         isShowRoleButton: function (os_data) {
             if (!os_data['BUTTON_ROLE']) return true;
-            const isUserRole = $customWebData.tools.hasRole(os_data['BUTTON_ROLE'], [staticProperties.user['ROLE'], staticProperties.user['PERNR']].join());
+            const isUserRole = $u.plugins.tools.hasRole(os_data['BUTTON_ROLE'], [staticProperties.user['ROLE'], staticProperties.user['PERNR']].join());
             if (!!os_data['VISIBLE'] && !!os_data['BUTTON_ROLE']) {
                 if (!isUserRole) os_data['VISIBLE'] = '';
                 return true;

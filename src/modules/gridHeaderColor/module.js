@@ -62,20 +62,19 @@ const defalutColor = {
         },
         method: {
             setOptions: function (gridObj, os_data) {
-                const columns =
-                    os_data['COLOR_HEADERS'] === 'ALL' ? $customWebData.tools.getVisibleGridColumnKeys(gridObj).join() : os_data['COLOR_HEADERS'] || '';
+                const columns = os_data['COLOR_HEADERS'] === 'ALL' ? $u.plugins.tools.getVisibleGridColumnKeys(gridObj).join() : os_data['COLOR_HEADERS'] || '';
                 const headerColor = os_data['HEADER_COLOR'] || defalutColor;
 
-                $customWebData.tools.trimSplit(columns).map(function (column) {
+                $u.plugins.tools.trimSplit(columns).map(function (column) {
                     if (gridObj.getGridHeader(column)) {
                         gridObj.setColumn({
                             name: column,
                             header: {
                                 style: {
-                                    background: $customWebData.tools.hexColorToRgbColor(headerColor['background']),
-                                    color: $customWebData.tools.hexColorToRgbColor(headerColor['font']),
-                                    hoveredBackground: $customWebData.tools.hexColorToRgbColor(headerColor['hover']),
-                                    selectedBackground: $customWebData.tools.hexColorToRgbColor(headerColor['selectedBackground'])
+                                    background: $u.plugins.tools.hexColorToRgbColor(headerColor['background']),
+                                    color: $u.plugins.tools.hexColorToRgbColor(headerColor['font']),
+                                    hoveredBackground: $u.plugins.tools.hexColorToRgbColor(headerColor['hover']),
+                                    selectedBackground: $u.plugins.tools.hexColorToRgbColor(headerColor['selectedBackground'])
                                 }
                             }
                         });
