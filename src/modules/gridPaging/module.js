@@ -29,22 +29,21 @@ export const info = {
         }
     },
     method: {
-        option: {
-            isUsed: false
-        },
         setOptions: function (gridObj, os_data) {
-            info.method.option.isUsed = os_data['TEST_COLUMNS'] === 'A';
-            info.method.option.page = os_data['TEST_COLUMNS_A'];
+            gridObj.__plugin__gridPaging_isUsed = os_data['TEST_COLUMNS'] === 'A';
+            gridObj.__plugin__gridPaging_page = os_data['TEST_COLUMNS_A'];
+            gridPagination(gridObj, []);
         },
         gridPagination: function (gridObj, ot_data) {
-            if (info.method.option.isUsed) gridPagination(gridObj, ot_data);
+            gridPagination(gridObj, ot_data);
         }
     },
     init: function () {}
 };
 function gridPagination(gridObj, gridData) {
+    if (!gridObj.__plugin__gridPaging_isUsed) return;
     const gridView = gridObj._rg.gridView;
-    const options = info.method.option.page || {pageSize: 30, pageSizes: [30, 50, 100, 200, '전체']};
+    const options = gridObj.__plugin__gridRowColor_page || {pageSize: 30, pageSizes: [30, 50, 100, 200, '전체']};
     const paginationState = {currentPage: 1, pageSize: options.pageSize, totalCount: 0, totalPages: 0};
     const gridPaginationContainer = $('#grid-pagination-container');
 

@@ -6,7 +6,9 @@
 
     <groupId>com.unipost.unidocu-plugins</groupId>
     <artifactId>unidocuOptionExpansion</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.0-alpha</version>
+
+    <packaging>pom</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -69,38 +71,21 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.0.1</version>
-                <executions>
-                    <execution>
-                        <id>default-resources</id>
-                        <goals>
-                            <goal>resources</goal>
-                        </goals>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <resources>
-                                <resource>
-                                    <directory>${project.basedir}/out/src/main/resources</directory>
-                                    <!--<includes>
-                                        <include>./$uPlugins.j</include>
-                                    </includes>-->
-                                    <excludes>
-                                        <exclude>**/test/**</exclude>
-                                        <exclude>**/types/**</exclude>
-                                        <exclude>**/node_modules/**</exclude>
-                                        <exclude>**/*.ts</exclude>
-                                    </excludes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.4</version>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.3.0</version> <executions>
+                <execution>
+                    <id>make-zip</id>
+                    <phase>package</phase> <goals>
+                    <goal>single</goal> </goals>
+                    <configuration>
+                        <descriptors>
+                            <descriptor>zip.xml</descriptor>
+                        </descriptors>
+                        <finalName>${project.artifactId}</finalName>
+                        <appendAssemblyId>false</appendAssemblyId>
+                    </configuration>
+                </execution>
+            </executions>
             </plugin>
         </plugins>
     </build>

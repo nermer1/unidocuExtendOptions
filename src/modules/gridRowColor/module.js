@@ -50,8 +50,8 @@ const defalutColor = {background: '#ffffff'},
                         break;
                     }
                 }
-                if (gridObj.rg.tree.isTreeMode()) return info.method.option.isUsed && readOnly;
-                return info.method.option.isUsed && readOnly && !gridObj._rg.gridView.isMergedGrouped();
+                if (gridObj.rg.tree.isTreeMode()) return gridObj.__plugin__gridRowColor_isUsed && readOnly;
+                return gridObj.__plugin__gridRowColor_isUsed && readOnly && !gridObj._rg.gridView.isMergedGrouped();
             },
             changeBgColorHandler: function (gridObj, rowIndex) {
                 if (!info.method.getUsed(gridObj)) return;
@@ -66,7 +66,7 @@ const defalutColor = {background: '#ffffff'},
                 }
                 gridObj.preSelectedIndex = $u.plugins.tools.originalRowIndex(gridObj, rowIndex);
                 gridObj.preCellColorMap = info.method.getSaveColors(gridObj, gridObj.preSelectedIndex);
-                gridObj.setRowBgColor(gridObj.preSelectedIndex, info.method.option.color);
+                gridObj.setRowBgColor(gridObj.preSelectedIndex, gridObj.__plugin__gridRowColor_color);
             },
             getSaveColors: function (gridObj, rowIndex) {
                 return gridObj.getGridHeaders().reduce(function (colorMap, gridInfo) {

@@ -25,12 +25,23 @@ export const info = {
     },
     method: {
         setOptions: function (gridObj, os_data) {
-            const groupInfo = os_data['GROUPING'] || '';
+            let groupInfo = os_data['GROUPING'] || '';
             const height = os_data['HEADER_HEIGHT'] || '';
             if (height) gridObj._rg.gridView.setHeader({height: height});
             if (!groupInfo) return;
             else if (Array.isArray(groupInfo) && groupInfo.length === 0) return;
             else if (typeof groupInfo === 'object' && Object.keys(groupInfo).length === 0) return;
+
+            groupInfo = groupInfo.map((item) => {
+                if (item.hasOwnProperty('groupText')) return item;
+                const key = Object.keys(item)[0];
+                const value = item[key];
+
+                return {
+                    groupText: key,
+                    childColumns: value
+                };
+            });
             gridObj.setGroupHeader(groupInfo);
         }
     },
