@@ -115,12 +115,85 @@ const {extraModules = []} = config;
 
 $u.plugins.addPlugin('unidocuOptionExpansion', {
     config: config,
-    init: (test) => {
+    init: (pluginHandlers) => {
         $customWebData.module = new $customWebData.moduleManager();
         extraModules.forEach((name) => $customWebData.module.add(name));
-        webDataCustomize();
+        $customWebData.addCustomHook(pluginHandlers);
     }
 });
+
+// 이벤트? 기준 정의 필요함
+$customWebData.addCustomHook = (pluginHandlers) => {
+    const buttonRole = $customWebData.module.getModule('buttonRole');
+    const gridSelectedOptions = $customWebData.module.getModule('gridSelectedOptions');
+    const gridRowColor = $customWebData.module.getModule('gridRowColor');
+    const gridSorting = $customWebData.module.getModule('gridSorting');
+    const gridHeaderColor = $customWebData.module.getModule('gridHeaderColor');
+    const gridTooltip = $customWebData.module.getModule('gridTooltip');
+    const gridPaging = $customWebData.module.getModule('gridPaging');
+
+    pluginHandlers.afterGetFormButtonsEl = (os_data) => {
+        if (buttonRole) {
+            if (!buttonRole.isShowRoleButton(os_data)) return true;
+        }
+    };
+
+    // 아래 2개는 어떤 식으로 hook name 을 지을까!
+    pluginHandlers.test = () => {
+        $customWebData.module.test('addEvent');
+    };
+
+    pluginHandlers.setGridOption = (gridObj, os_data) => {
+        $customWebData.module.test('setOptions', [gridObj, os_data]);
+    };
+
+    pluginHandlers.setCheckBarAsRadioArgs = (args) => {
+        if (gridSelectedOptions.option.isForce) {
+            args.useAsRadio = gridSelectedOptions.option.isRadio;
+        }
+        return args;
+    };
+
+    pluginHandlers.setHeaderCheckBoxArgs = (args) => {
+        if (gridSelectedOptions.option.isForce) {
+            args.useHeaderCheckbox = gridSelectedOptions.option.isCheckAll;
+        }
+        return args;
+    };
+
+    pluginHandlers.setColumnHideArgs = (args) => {
+        if (gridSelectedOptions.option.isForce) {
+            args.isHide = gridSelectedOptions.option.isHide;
+        }
+        return args;
+    };
+
+    pluginHandlers.setSortEnableArg = (args) => {
+        if (gridSorting.option.isForce) {
+            args.enable = gridSelectedOptions.option.isSort;
+        }
+        return args;
+    };
+
+    pluginHandlers.onAfterChangeCell = (gridObj, columnKey, rowIndex) => {
+        if (columnKey === 'SELECTED') {
+            if (gridRowColor) gridRowColor.changeBgColorHandler(gridObj, rowIndex);
+        }
+    };
+
+    pluginHandlers.onAfterRowActivate = (gridObj, rowIndex) => {
+        if (gridRowColor) gridRowColor.changeBgColorHandler(gridObj, rowIndex);
+    };
+
+    pluginHandlers.setAfterGroupHeader = (gridObj, os_data) => {
+        if (gridHeaderColor) gridHeaderColor.setOptions(gridObj, os_data);
+        if (gridTooltip) gridTooltip.setOptions(gridObj, os_data);
+    };
+
+    pluginHandlers.setAfterJSONData = (gridObj, jsonArray) => {
+        if (gridPaging) gridPaging.gridPagination(gridObj, jsonArray);
+    };
+};
 
 $customWebData.extendWebData = (webData) => {
     Object.keys(webData).forEach((key) => {
@@ -152,100 +225,6 @@ $customWebData.extendWebData = (webData) => {
     });
 };
 
-/**
- * form type이 Uni_Empty인 경우 웹데이타 아이디 "SUB_COLUMN_TYPE" 값에 따른 form 추가
- *
- * SUB_COLUMN_TYPE - colorPicker: html default color picker type
- * SUB_COLUMN_TYPE - jsonEditor: jsonEditor type
- * @see: $u.dialog.JSONInputDialog
- */
-$customWebData.customInputManager = function () {
-    this.getEl = function (column) {
-        const $el = $u.get(column);
-        if (!$el) throw '존재하지 않는 필드';
-        return $el;
-    };
-    this.init = function () {
-        $u.webData.formSetting.getData('gridSetting@form-data')['OT_DATA'].map((data) => {
-            if (data['COLUMN_TYPE'] === 'Uni_Empty') this[data['SUB_COLUMN_TYPE']].call(this, data['COLUMN_ID']);
-        });
-    };
-};
-
-/**
- * SUB_COLUMN_TYPE에 대한 초기화
- *
- * $u.get(form) getValue, setValue를 가져올 수 있도록 함수 재정의
- */
-$customWebData.customInputManager.prototype = {
-    colorPicker: function (column) {
-        let $self = this.getEl(column),
-            defalutValue = {},
-            $input;
-
-        $self.init = function () {
-            $input = [];
-            $self.params.options.map(function (item, index) {
-                $self.$el.append(item['element']);
-                const colorPicker = $($self.$el.find(`input:eq(${index})`));
-                const span = $($self.$el.find(`span:eq(${index})`));
-                colorPicker.attr('name', item['key']);
-                $input.push(colorPicker);
-                defalutValue[item['key']] = item['defalutValue'];
-                span.data('defalut', defalutValue[item['key']]);
-                span.click(() => {
-                    colorPicker.val(span.data('defalut'));
-                });
-            });
-            $self.setValue(defalutValue);
-        };
-
-        $self.getValue = function () {
-            return $input.reduce((data, input) => {
-                data[input.attr('name')] = input.val();
-                return data;
-            }, {});
-        };
-
-        $self.setValue = function (value) {
-            $input.map((input) => {
-                input.val(value[input.attr('name')]);
-            });
-        };
-
-        $self.init();
-    },
-    jsonEditor: function (column) {
-        let $self = this.getEl(column),
-            $input;
-
-        const {defaultValue = {}} = $self.params;
-
-        $self.init = function () {
-            $self.$el.append('<div class="input-box"><input type="text" readonly/></div>');
-            $input = $self.$el.find('input');
-            if (!$u.plugins.tools.isEmptyObject(defaultValue)) $self.setValue(defaultValue);
-            $input.click(function () {
-                $u.dialog.JSONInputDialog.open(function (data) {
-                    $self.setValue(data);
-                }, $self.getValue());
-            });
-        };
-
-        $self.getValue = function () {
-            return $input.val() ? JSON.parse($input.val()) : '';
-        };
-
-        $self.setValue = function (value) {
-            value = value ? JSON.stringify(value) : '';
-            $input.val(value);
-        };
-
-        $self.init();
-    }
-};
-$customWebData.customInput = new $customWebData.customInputManager();
-
 $customWebData.moduleManager = function () {
     this.modules = {};
 };
@@ -264,159 +243,15 @@ $customWebData.moduleManager.prototype = {
     hasModule: function (moduleName) {
         return !!this.modules[moduleName];
     },
-    setOptions: function (gridObj, os_data) {
-        customizeBindExtendAPI(gridObj);
+    test: function (name, args = []) {
         Object.keys(this.modules).map((key) => {
-            const fn = this.modules[key]['method']['setOptions'];
-            if (typeof fn === 'function') fn(gridObj, os_data);
+            if (this.hasModule(key)) {
+                const module = this.getModule(key);
+                if (module.hasOwnProperty(name)) module[name].apply(this, args);
+            }
         });
+    },
+    setOptions: function (gridObj, os_data) {
+        this.test('setOptions', [gridObj, os_data]);
     }
 };
-
-/**
- * _onRowActivate, setGroupHeader 재정의
- *
- * @param gridObj 그리드 객체
- */
-function customizeBindExtendAPI(gridObj) {
-    const originalMethod = {
-        _onChangeCell: gridObj._onChangeCell,
-        setCheckBarAsRadio: gridObj.setCheckBarAsRadio,
-        setHeaderCheckBox: gridObj.setHeaderCheckBox,
-        setColumnHide: gridObj.setColumnHide,
-        setSortEnable: gridObj.setSortEnable,
-        setGroupHeader: gridObj.setGroupHeader,
-        setJSONData: gridObj.setJSONData
-    };
-    const gridRowColor = $customWebData.module.getModule('gridRowColor');
-    const gridSelectedOptions = $customWebData.module.getModule('gridSelectedOptions');
-    const gridSorting = $customWebData.module.getModule('gridSorting');
-    const gridHeaderColor = $customWebData.module.getModule('gridHeaderColor');
-    const gridTooltip = $customWebData.module.getModule('gridTooltip');
-    const gridPaging = $customWebData.module.getModule('gridPaging');
-    gridObj._onChangeCell = function (columnKey, rowIndex, oldValue, newValue) {
-        originalMethod['_onChangeCell'].call(this, columnKey, rowIndex, oldValue, newValue);
-        if (columnKey === 'SELECTED') gridRowColor.changeBgColorHandler(gridObj, rowIndex);
-    };
-    gridObj.setCheckBarAsRadio = function (columnKey, useAsRadio) {
-        if (gridRowColor) {
-            if (gridSelectedOptions.option.isForce) useAsRadio = gridSelectedOptions.option.isRadio;
-        }
-        originalMethod['setCheckBarAsRadio'].call(this, columnKey, useAsRadio);
-    };
-    gridObj.setHeaderCheckBox = function (columnKey, useHeaderCheckbox) {
-        if (gridSelectedOptions) {
-            if (gridSelectedOptions.option.isForce) useHeaderCheckbox = gridSelectedOptions.option.isCheckAll;
-        }
-        originalMethod['setHeaderCheckBox'].call(this, columnKey, useHeaderCheckbox);
-    };
-    gridObj.setColumnHide = function (columnKey, isHide) {
-        if (gridSelectedOptions) {
-            if (gridSelectedOptions.option.isForce) isHide = gridSelectedOptions.option.isHide;
-        }
-        originalMethod['setColumnHide'].call(this, columnKey, isHide);
-    };
-    gridObj.setSortEnable = function (enable) {
-        if (gridSorting) {
-            if (gridSorting.option.isForce) enable = gridSorting.option.isSort;
-        }
-        originalMethod['setSortEnable'].call(this, enable);
-    };
-    gridObj._onRowActivate = function (rowIndex) {
-        gridObj['__onRowActivate'].apply(this, arguments);
-        if (gridRowColor) gridRowColor.changeBgColorHandler(gridObj, rowIndex);
-    };
-    gridObj.setGroupHeader = function (groupInfo) {
-        originalMethod['setGroupHeader'].call(this, groupInfo);
-        const os_data = $u.webData.gridSetting.getData($u.webData.getWEB_DATA_ID([$u.page.getPROGRAM_ID(), $(gridObj).data('subId')]))['OS_DATA'];
-        if (gridHeaderColor) gridHeaderColor.setOptions(gridObj, os_data);
-        if (gridTooltip) gridTooltip.setOptions(gridObj, os_data);
-    };
-    gridObj.setJSONData = function (jsonArray) {
-        originalMethod['setJSONData'].call(this, jsonArray);
-        if (gridPaging) gridPaging.gridPagination(gridObj, jsonArray);
-    };
-}
-
-function webDataCustomize() {
-    // button
-    // customize.css
-    /**
-     * $u.buttons.getFormButtonsEl 재정의
-     *
-     * @param ot_data 저장된 웹데이터
-     * @return 처리된 버튼 객체
-     */
-    $u.buttons.getFormButtonsEl = function (ot_data) {
-        let $buttons = [];
-        $.each(ot_data, function (index, os_data) {
-            if (os_data['NOT_IN_USE'] === '1') return true;
-            if ($customWebData.module.hasModule('buttonRole')) {
-                if (!$customWebData.module.getModule('buttonRole').isShowRoleButton(os_data)) return true;
-            }
-            $buttons.push($u.buttons.getSingleButtonsEl(os_data));
-            $($buttons[index]).addClass(os_data['VISIBLE']);
-        });
-        return $buttons;
-    };
-
-    /**
-     * $u.webData.ignoreCacheSelectOne 재정의
-     *
-     * @param scope F8 setting 영역
-     * @param web_data_id F8 웹데이터 아이디
-     * @param callback 콜백함수
-     */
-    $u.webData.ignoreCacheSelectOne = function (scope, web_data_id, callback) {
-        if ($u.webData.hasCustomWebData(web_data_id)) {
-            callback($u.webData.getCustomWebData(web_data_id));
-            return;
-        }
-
-        const importParam = {
-            MODE: 'selectOne',
-            SCOPE: scope,
-            WEB_DATA_ID: web_data_id
-        };
-        $nst.is_data_os_data('ZUNIECM_WEB_DATA', importParam, function (os_data) {
-            const data = $u.webData.getSingleSafeData(os_data['DATA']);
-            callback(data);
-            if (scope === 'gridSetting') {
-                extraModules.forEach((item) => {
-                    const name = item['moduleName'];
-                    if ($customWebData.module.hasModule(name)) {
-                        const module = $customWebData.module.getModule(name);
-                        if (module.hasOwnProperty('changeHandler')) module.changeHandler(data['OS_DATA']);
-                    }
-                });
-            }
-        });
-    };
-
-    // render custom
-    const _renderUIComponents = $u.renderUIComponents;
-    $u.renderUIComponents = function ($scope, subGroup, customParam) {
-        _renderUIComponents($scope, subGroup, customParam);
-        if (subGroup === 'gridSetting') {
-            extraModules.forEach((item) => {
-                const name = item['moduleName'];
-                if ($customWebData.module.hasModule(name)) {
-                    const module = $customWebData.module.getModule(name);
-                    if (module.hasOwnProperty('addEvent')) module.addEvent();
-                }
-            });
-            $customWebData.customInput.init();
-        }
-    };
-
-    // grid custom
-    const _renderGridSingle = $u.renderGridSingle;
-    $u.renderGridSingle = function (gridObj, subGroup) {
-        _renderGridSingle(gridObj, subGroup);
-        var $gridObj = $(gridObj);
-        $customWebData.module.setOptions(
-            gridObj,
-            $u.webData.gridSetting.getData($u.webData.getWEB_DATA_ID([$gridObj.data('subGroup'), $gridObj.data('subId')]))['OS_DATA']
-        );
-    };
-}

@@ -41,6 +41,7 @@ export const info = {
             $efi.createStatement.bindEvent.bindChange('USE_SUMMARY', function () {
                 info['method'].changeHandler({USE_SUMMARY: $u.get('USE_SUMMARY').getValue()});
             });
+            $efi.createStatement.bindEvent.triggerChange('USE_SUMMARY');
         }
     },
     init: function () {}

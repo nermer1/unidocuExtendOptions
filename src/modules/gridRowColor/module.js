@@ -2,7 +2,7 @@
  *
  *
  */
-const defalutColor = {background: '#ffffff'},
+const defaultColor = {background: '#ffffff'},
     info = {
         version: '1.0.0',
         category: 'gridSetting',
@@ -24,7 +24,7 @@ const defalutColor = {background: '#ffffff'},
                         OPTIONS: [
                             {
                                 key: 'background',
-                                defalutValue: defalutColor['background'],
+                                defaultValue: defaultColor['background'],
                                 element:
                                     "<div style='display: inline-flex; align-items: center; margin-right: 10px;'><input type='color'><span style='margin-right: 5px;'>:배경</span></div>"
                             }
@@ -35,7 +35,7 @@ const defalutColor = {background: '#ffffff'},
         },
         method: {
             setOptions: function (gridObj, os_data) {
-                const color = os_data['SET_ROW_COLOR_SELECT'] ? os_data['SET_ROW_COLOR_SELECT']['background'] : defalutColor['background'];
+                const color = os_data['SET_ROW_COLOR_SELECT'] ? os_data['SET_ROW_COLOR_SELECT']['background'] : defaultColor['background'];
                 gridObj.__plugin__gridRowColor_isUsed = os_data['SET_ROW_COLOR'] === '1';
                 gridObj.__plugin__gridRowColor_color = $u.plugins.tools.hexColorToRgbColor(color);
             },

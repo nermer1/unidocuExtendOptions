@@ -2,7 +2,7 @@
  *
  *
  */
-const defalutColor = {
+const defaultColor = {
         background: '#fcfcfc',
         font: '#333333',
         hover: '#efefef',
@@ -28,25 +28,25 @@ const defalutColor = {
                         OPTIONS: [
                             {
                                 key: 'background',
-                                defalutValue: defalutColor['background'],
+                                defaultValue: defaultColor['background'],
                                 element:
                                     "<div style='display: inline-flex; align-items: center; margin-right: 10px;'><input type='color'><span style='margin-right: 5px;'>:배경</span></div>"
                             },
                             {
                                 key: 'font',
-                                defalutValue: defalutColor['font'],
+                                defaultValue: defaultColor['font'],
                                 element:
                                     "<div style='display: inline-flex; align-items: center; margin-right: 10px;'><input type='color'><span style='margin-right: 5px;'>:글자</span></div>"
                             },
                             {
                                 key: 'hover',
-                                defalutValue: defalutColor['hover'],
+                                defaultValue: defaultColor['hover'],
                                 element:
                                     "<div style='display: inline-flex; align-items: center; margin-right: 10px;'><input type='color'><span style='margin-right: 5px;'>:오버</span></div>"
                             },
                             {
                                 key: 'selectedBackground',
-                                defalutValue: defalutColor['selectedBackground'],
+                                defaultValue: defaultColor['selectedBackground'],
                                 element:
                                     "<div style='display: inline-flex; align-items: center; margin-right: 10px;'><input type='color'><span style='margin-right: 5px;'>:선택배경</span></div>"
                             }
@@ -56,7 +56,7 @@ const defalutColor = {
             },
             'gridSetting@GRIDHEADER': {
                 OS_DATA: {
-                    HEADER_COLOR: defalutColor
+                    HEADER_COLOR: defaultColor
                 }
             }
         },
@@ -64,7 +64,7 @@ const defalutColor = {
             setOptions: function (gridObj, os_data) {
                 let isAll = os_data['COLOR_HEADERS'] === 'ALL',
                     columns = isAll ? $u.plugins.tools.getVisibleGridColumnKeys(gridObj).join() : os_data['COLOR_HEADERS'] || '',
-                    color = os_data['HEADER_COLOR'] || defalutColor,
+                    color = os_data['HEADER_COLOR'] || defaultColor,
                     colorMap = {
                         styles: {
                             background: color['background'],

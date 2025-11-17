@@ -58,6 +58,7 @@ export const info = {
             $efi.createStatement.bindEvent.bindChange('SORTING_NOT_USED', function () {
                 info['method'].changeHandler({SORTING_NOT_USED: $u.get('SORTING_NOT_USED').getValue()});
             });
+            $efi.createStatement.bindEvent.triggerChange('SORTING_NOT_USED');
         }
     },
     init: function () {}
