@@ -30,27 +30,47 @@ export const info = {
             ]
         }
     },
-    method: {
+    state: {
         option: {
             isHide: false,
             isRadio: false,
             isCheckAll: false,
             isForce: false
-        },
-        setOptions: function (gridObj, os_data) {
+        }
+    },
+    hooks: {
+        setGridOption: function (gridObj, os_data) {
             const alphaOption = os_data['SELECTED_OPTIONS_A'] || '';
             const option = os_data['SELECTED_OPTIONS'] || '',
                 isHide = !!option.match('A'),
                 isRadio = !!option.match('B'),
                 isCheckAll = !!option.match('C'),
                 isForce = !!alphaOption.match('1');
-            info.method.option.isHide = isHide;
-            info.method.option.isRadio = isRadio;
-            info.method.option.isCheckAll = isCheckAll;
-            info.method.option.isForce = isForce;
+            info.state.option.isHide = isHide;
+            info.state.option.isRadio = isRadio;
+            info.state.option.isCheckAll = isCheckAll;
+            info.state.option.isForce = isForce;
             gridObj.setColumnHide('SELECTED', isHide);
             gridObj.setCheckBarAsRadio('SELECTED', isRadio);
             gridObj.setHeaderCheckBox('SELECTED', isCheckAll);
+        },
+        setCheckBarAsRadioArgs: function (args) {
+            if (info.state.option.isForce) {
+                args.useAsRadio = info.state.option.isRadio;
+            }
+            return args;
+        },
+        setHeaderCheckBoxArgs: function (args) {
+            if (info.state.option.isForce) {
+                args.useHeaderCheckbox = info.state.option.isCheckAll;
+            }
+            return args;
+        },
+        setColumnHideArgs: function (args) {
+            if (info.state.option.isForce) {
+                args.isHide = info.state.option.isHide;
+            }
+            return args;
         }
     },
     init: function () {}

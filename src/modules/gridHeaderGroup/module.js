@@ -23,8 +23,8 @@ export const info = {
             ]
         }
     },
-    method: {
-        setOptions: function (gridObj, os_data) {
+    hooks: {
+        setGridOption: function (gridObj, os_data) {
             let groupInfo = os_data['GROUPING'] || '';
             const height = os_data['HEADER_HEIGHT'] || '';
             if (height) gridObj._rg.gridView.setHeader({height: height});
@@ -32,16 +32,25 @@ export const info = {
             else if (Array.isArray(groupInfo) && groupInfo.length === 0) return;
             else if (typeof groupInfo === 'object' && Object.keys(groupInfo).length === 0) return;
 
-            groupInfo = groupInfo.map((item) => {
-                if (item.hasOwnProperty('groupText')) return item;
-                const key = Object.keys(item)[0];
-                const value = item[key];
+            if (Array.isArray(groupInfo)) {
+                groupInfo = groupInfo.map((item) => {
+                    if (item.hasOwnProperty('groupText')) return item;
+                    const key = Object.keys(item)[0];
+                    const value = item[key];
 
-                return {
-                    groupText: key,
-                    childColumns: value
-                };
-            });
+                    return {
+                        groupText: key,
+                        childColumns: value
+                    };
+                });
+            } else {
+                groupInfo = Object.keys(groupInfo).map((key) => {
+                    return {
+                        groupText: key,
+                        childColumns: groupInfo[key]
+                    };
+                });
+            }
             gridObj.setGroupHeader(groupInfo);
         }
     },

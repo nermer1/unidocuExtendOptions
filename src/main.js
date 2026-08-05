@@ -122,77 +122,28 @@ $u.plugins.addPlugin('unidocuOptionExpansion', {
     }
 });
 
-// 이벤트? 기준 정의 필요함
 $customWebData.addCustomHook = (pluginHandlers) => {
-    const buttonRole = $customWebData.module.getModule('buttonRole');
-    const gridSelectedOptions = $customWebData.module.getModule('gridSelectedOptions');
-    const gridRowColor = $customWebData.module.getModule('gridRowColor');
-    const gridSorting = $customWebData.module.getModule('gridSorting');
-    const gridHeaderColor = $customWebData.module.getModule('gridHeaderColor');
-    const gridTooltip = $customWebData.module.getModule('gridTooltip');
-    const gridPaging = $customWebData.module.getModule('gridPaging');
+    Object.values($customWebData.module.modules).forEach((moduleData) => {
+        const hooks = moduleData.hooks || {};
+        Object.keys(hooks).forEach((hookName) => {
+            const existingHandler = pluginHandlers[hookName];
 
-    pluginHandlers.afterGetFormButtonsEl = (os_data) => {
-        if (buttonRole) {
-            if (!buttonRole.isShowRoleButton(os_data)) return true;
-        }
-    };
-
-    // 아래 2개는 어떤 식으로 hook name 을 지을까!
-    pluginHandlers.test = () => {
-        $customWebData.module.test('addEvent');
-    };
-
-    pluginHandlers.setGridOption = (gridObj, os_data) => {
-        $customWebData.module.test('setOptions', [gridObj, os_data]);
-    };
-
-    pluginHandlers.setCheckBarAsRadioArgs = (args) => {
-        if (gridSelectedOptions.option.isForce) {
-            args.useAsRadio = gridSelectedOptions.option.isRadio;
-        }
-        return args;
-    };
-
-    pluginHandlers.setHeaderCheckBoxArgs = (args) => {
-        if (gridSelectedOptions.option.isForce) {
-            args.useHeaderCheckbox = gridSelectedOptions.option.isCheckAll;
-        }
-        return args;
-    };
-
-    pluginHandlers.setColumnHideArgs = (args) => {
-        if (gridSelectedOptions.option.isForce) {
-            args.isHide = gridSelectedOptions.option.isHide;
-        }
-        return args;
-    };
-
-    pluginHandlers.setSortEnableArg = (args) => {
-        if (gridSorting.option.isForce) {
-            args.enable = gridSelectedOptions.option.isSort;
-        }
-        return args;
-    };
-
-    pluginHandlers.onAfterChangeCell = (gridObj, columnKey, rowIndex) => {
-        if (columnKey === 'SELECTED') {
-            if (gridRowColor) gridRowColor.changeBgColorHandler(gridObj, rowIndex);
-        }
-    };
-
-    pluginHandlers.onAfterRowActivate = (gridObj, rowIndex) => {
-        if (gridRowColor) gridRowColor.changeBgColorHandler(gridObj, rowIndex);
-    };
-
-    pluginHandlers.setAfterGroupHeader = (gridObj, os_data) => {
-        if (gridHeaderColor) gridHeaderColor.setOptions(gridObj, os_data);
-        if (gridTooltip) gridTooltip.setOptions(gridObj, os_data);
-    };
-
-    pluginHandlers.setAfterJSONData = (gridObj, jsonArray) => {
-        if (gridPaging) gridPaging.gridPagination(gridObj, jsonArray);
-    };
+            if (existingHandler) {
+                // 이미 해당 훅을 선언한 모듈이 있다면 체이닝 처리 (릴레이 실행)
+                pluginHandlers[hookName] = function (...args) {
+                    const res1 = existingHandler.apply(this, args);
+                    // Filter 훅(이름에 Arg가 들어감)인 경우, 이전 모듈의 결과값을 다음 모듈에 넘겨줌
+                    const isFilterHook = hookName.indexOf('Arg') !== -1;
+                    const nextArgs = isFilterHook ? [res1 !== undefined ? res1 : args[0]] : args;
+                    const res2 = hooks[hookName].apply(this, nextArgs);
+                    return res2 !== undefined ? res2 : res1;
+                };
+            } else {
+                // 최초 등록
+                pluginHandlers[hookName] = hooks[hookName];
+            }
+        });
+    });
 };
 
 $customWebData.extendWebData = (webData) => {
@@ -232,26 +183,14 @@ $customWebData.moduleManager.prototype = {
     add: function (data) {
         let name = data['moduleName'];
         if (this.modules[name]) throw `모듈 ${name}(이/가) 중복 등록 불가`;
+
         this.modules[name] = data;
         $customWebData.extendWebData(data['webData']);
         if (typeof data['init'] === 'function') data['init'].call(this);
     },
-    getModule: function (moduleName) {
-        if (!this.hasModule(moduleName)) throw `모듈 ${moduleName}(이/가) 존재하지 않음`;
-        return this.modules[moduleName]['method'];
-    },
     hasModule: function (moduleName) {
         return !!this.modules[moduleName];
-    },
-    test: function (name, args = []) {
-        Object.keys(this.modules).map((key) => {
-            if (this.hasModule(key)) {
-                const module = this.getModule(key);
-                if (module.hasOwnProperty(name)) module[name].apply(this, args);
-            }
-        });
-    },
-    setOptions: function (gridObj, os_data) {
-        this.test('setOptions', [gridObj, os_data]);
     }
 };
+
+export default $customWebData;

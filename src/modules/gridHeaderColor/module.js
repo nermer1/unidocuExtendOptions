@@ -60,25 +60,17 @@ const defaultColor = {
                 }
             }
         },
-        method: {
-            setOptions: function (gridObj, os_data) {
+        hooks: {
+            setGridOption: function (gridObj, os_data) {
                 let isAll = os_data['COLOR_HEADERS'] === 'ALL',
                     columns = isAll ? $u.plugins.tools.getVisibleGridColumnKeys(gridObj).join() : os_data['COLOR_HEADERS'] || '',
                     color = os_data['HEADER_COLOR'] || defaultColor,
-                    colorMap = {
-                        styles: {
-                            background: color['background'],
-                            foreground: color['font'],
-                            hoveredBackground: color['hover'],
-                            selectedBackground: color['selectedBackground']
-                        }
-                    },
-                    gridGroupHeaderInfo = gridObj.groupIndexGroupHeaderMap || {};
+                    gridGroupHeaderInfo = gridObj.groupIndexGroupHeaderMap || {},
+                    columnKeys = $u.plugins.tools
+                        .trimSplit(columns)
+                        .concat(isAll ? Object.values(gridGroupHeaderInfo).map((groupParent) => groupParent['name']) : []);
 
-                $u.plugins.tools
-                    .trimSplit(columns)
-                    .concat(isAll ? Object.values(gridGroupHeaderInfo).map((groupParent) => groupParent['name']) : [])
-                    .forEach((columnKey) => gridObj._rg.gridView.setColumnProperty(columnKey, 'header', colorMap));
+                $u.plugins.tools.setHeaderStyle(gridObj, columnKeys, color);
             }
         },
         init: function () {}

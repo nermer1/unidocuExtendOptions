@@ -27,19 +27,21 @@ export const info = {
             ]
         }
     },
-    method: {
+    state: {
         option: {
             isSort: false,
             isForce: false
-        },
-        setOptions: function (gridObj, os_data) {
+        }
+    },
+    hooks: {
+        setGridOption: function (gridObj, os_data) {
             const alphaOption = os_data['SORTING_NOT_USED_A'] || '';
             var option = os_data['SORTING_NOT_USED'] || '',
                 isSort = !option.match('A'),
                 isExplicit = alphaOption.match('A'),
                 isForce = !!alphaOption.match('B');
-            info.method.option.isSort = isSort;
-            info.method.option.isForce = isForce;
+            info.state.option.isSort = isSort;
+            info.state.option.isForce = isForce;
             gridObj._rg.setSortingOptions({enabled: isSort});
             if (isSort && isExplicit) gridObj._rg.gridView.setOptions({sortMode: 'explicit'});
         },
@@ -54,11 +56,17 @@ export const info = {
                 $u.get(formId).$el.find('input').first().prop('disabled', false);
             }
         },
-        addEvent: function () {
+        test: function () {
             $efi.createStatement.bindEvent.bindChange('SORTING_NOT_USED', function () {
-                info['method'].changeHandler({SORTING_NOT_USED: $u.get('SORTING_NOT_USED').getValue()});
+                info.hooks.changeHandler({SORTING_NOT_USED: $u.get('SORTING_NOT_USED').getValue()});
             });
             $efi.createStatement.bindEvent.triggerChange('SORTING_NOT_USED');
+        },
+        setSortEnableArg: function (args) {
+            if (info.state.option.isForce) {
+                args.enable = info.state.option.isSort;
+            }
+            return args;
         }
     },
     init: function () {}

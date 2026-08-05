@@ -24,11 +24,11 @@ export const info = {
             ]
         }
     },
-    method: {
-        setOptions: function (gridObj, os_data) {
+    hooks: {
+        setGridOption: function (gridObj, os_data) {
             const isSummary = os_data['USE_SUMMARY'] === '1',
                 footer = os_data['USE_SUMMARY_A'] === '1' ? 'footer' : '';
-            gridObj.setSummaryVisible(isSummary, footer);
+            if (isSummary) gridObj.setSummaryVisible(isSummary, footer);
         },
         changeHandler: function (os_data = {}) {
             const {USE_SUMMARY: used} = os_data;
@@ -37,9 +37,9 @@ export const info = {
             if (used === '1') $u.get(formId).setReadOnly(false);
             else $u.get(formId).setReadOnly(true);
         },
-        addEvent: function () {
+        test: function () {
             $efi.createStatement.bindEvent.bindChange('USE_SUMMARY', function () {
-                info['method'].changeHandler({USE_SUMMARY: $u.get('USE_SUMMARY').getValue()});
+                info.hooks.changeHandler({USE_SUMMARY: $u.get('USE_SUMMARY').getValue()});
             });
             $efi.createStatement.bindEvent.triggerChange('USE_SUMMARY');
         }

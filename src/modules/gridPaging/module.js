@@ -28,13 +28,13 @@ export const info = {
             ]
         }
     },
-    method: {
-        setOptions: function (gridObj, os_data) {
+    hooks: {
+        setGridOption: function (gridObj, os_data) {
             gridObj.__plugin__gridPaging_isUsed = os_data['TEST_COLUMNS'] === 'A';
             gridObj.__plugin__gridPaging_page = os_data['TEST_COLUMNS_A'];
             gridPagination(gridObj, []);
         },
-        gridPagination: function (gridObj, ot_data) {
+        setAfterJSONData: function (gridObj, ot_data) {
             gridPagination(gridObj, ot_data);
         }
     },
