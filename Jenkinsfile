@@ -28,14 +28,17 @@ pipeline {
                 sh 'npm run build'            // webpack → dist/plugin.js
             }
         }
-        stage('Package & Deploy to NAS') {
+        stage('Deploy to NAS') {
             steps {
-                // zip 대신 jar(=zip 포맷, JDK 기본 제공)로 패키징. cfM = 매니페스트 없이 plugin.js 만
+                // featured(B2 조립): 조각들을 <NAS>/<id>/pieces/ 로 배포.
+                //   npm run build 가 통짜(dist/plugin.js) + 조각(dist/pieces/*.js) 둘 다 생성.
+                //   마켓 download 시 서버가 _runtime + 고른 조각을 concat 해 plugin.js 생성.
                 sh '''
-                    mkdir -p "${NAS_DIR}"
-                    cd dist && jar cfM "../${PLUGIN_ID}-${VERSION}.zip" plugin.js && cd ..
-                    cp "${PLUGIN_ID}-${VERSION}.zip" "${NAS_DIR}/"
-                    echo "배포 완료: ${NAS_DIR}/${PLUGIN_ID}-${VERSION}.zip"
+                    DEST="${NAS_DIR}/${PLUGIN_ID}/pieces"
+                    mkdir -p "${DEST}"
+                    cp dist/pieces/*.js "${DEST}/"
+                    echo "배포 완료(조각): ${DEST}/"
+                    ls -1 "${DEST}/"
                 '''
             }
         }

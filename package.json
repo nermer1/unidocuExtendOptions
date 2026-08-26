@@ -2,7 +2,9 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "compile": "prettier --write --ignore-path .prettierignore ./ && npm run build",
-        "build": "webpack --config webpack.config.js"
+        "build": "webpack --config webpack.config.js && webpack --config webpack.pieces.config.js",
+        "build:whole": "webpack --config webpack.config.js",
+        "build:pieces": "webpack --config webpack.pieces.config.js"
     },
     "devDependencies": {
         "@babel/cli": "^7.22.9",

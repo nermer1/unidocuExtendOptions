@@ -116,8 +116,14 @@ const {extraModules = []} = config;
 $u.plugins.addPlugin('unidocuOptionExpansion', {
     config: config,
     init: (pluginHandlers) => {
+        // config.js 옵션으로 enabledModules 주입 시 해당 모듈만 등록 (미지정 = 전체)
+        //   extraPlugins: [{name:'unidocuOptionExpansion', getOptions:()=>({enabledModules:['gridSorting','gridSummary']})}]
+        const opts = (typeof $u.plugins.getOptions === 'function' && $u.plugins.getOptions('unidocuOptionExpansion')) || {};
+        const enabled = Array.isArray(opts.enabledModules) ? opts.enabledModules : null;
+        const activeModules = enabled ? extraModules.filter((m) => enabled.indexOf(m.moduleName) !== -1) : extraModules;
+
         $customWebData.module = new $customWebData.moduleManager();
-        extraModules.forEach((name) => $customWebData.module.add(name));
+        activeModules.forEach((name) => $customWebData.module.add(name));
         $customWebData.addCustomHook(pluginHandlers);
     }
 });
