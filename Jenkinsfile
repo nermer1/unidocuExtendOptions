@@ -34,7 +34,8 @@ pipeline {
                 //   npm run build 가 통짜(dist/plugin.js) + 조각(dist/pieces/*.js) 둘 다 생성.
                 //   마켓 download 시 서버가 _runtime + 고른 조각을 concat 해 plugin.js 생성.
                 sh '''
-                    DEST="${NAS_DIR}/${PLUGIN_ID}/pieces"
+                    VER=$(node -p "require('./package.json').version")
+                    DEST="${NAS_DIR}/${PLUGIN_ID}/${VER}/pieces"
                     mkdir -p "${DEST}"
                     cp dist/pieces/*.js "${DEST}/"
                     echo "배포 완료(조각): ${DEST}/"
